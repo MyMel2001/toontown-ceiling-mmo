@@ -14,3 +14,7 @@ G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GARDEN_nbrhood.ogg')
 G["music"].setLoop(True)
 G["music"].play()
+
+from cog import CogManager
+base.cogMgr = CogManager()
+base.cogMgr.spawnCog('B', 'phase_3.5/models/char/suitB-heads.bam', (0, -40, 0))

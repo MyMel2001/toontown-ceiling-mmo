@@ -1038,55 +1038,55 @@ group "donaldsDreamland" [
        height [ 32.1583 ]
        flags [ "d" ]
        text [
-        letters [ "B" ]
+        letters [ "P" ]
        ]
        text [
-        letters [ "e" ]
+        letters [ "T" ]
        ]
        text [
-        letters [ "d" ]
+        letters [ "s" ]
        ]
        text [
-        letters [ "t" ]
+        letters [ "" ]
        ]
        text [
-        letters [ "i" ]
+        letters [ "" ]
        ]
        text [
-        letters [ "m" ]
+        letters [ "X" ]
        ]
        text [
-        letters [ "e" ]
+        letters [ "P" ]
        ]
        text [
         letters [ " " ]
        ]
        text [
-        letters [ "B" ]
+        letters [ "F" ]
        ]
        text [
-        letters [ "o" ]
-       ]
-       text [
-        letters [ "u" ]
-       ]
-       text [
-        letters [ "l" ]
-       ]
-       text [
-        letters [ "e" ]
-       ]
-	   text [
-        letters [ "v" ]
-       ]
-	   text [
         letters [ "a" ]
        ]
-	   text [
+       text [
         letters [ "r" ]
        ]
+       text [
+        letters [ "m" ]
+       ]
+       text [
+        letters [ "" ]
+       ]
 	   text [
-        letters [ "d" ]
+        letters [ "" ]
+       ]
+	   text [
+        letters [ "" ]
+       ]
+	   text [
+        letters [ "" ]
+       ]
+	   text [
+        letters [ "" ]
        ]
       ]
       baseline [
@@ -1097,61 +1097,61 @@ group "donaldsDreamland" [
        width [ 38.6997 ]
        height [ 38.6997 ]
        text [
-        letters [ "D" ]
+        letters [ "" ]
        ]
        text [
-        letters [ "O" ]
+        letters [ "P" ]
        ]
        text [
-        letters [ "N" ]
-       ]
-       text [
-        letters [ "A" ]
-       ]
-       text [
-        letters [ "L" ]
-       ]
-       text [
-        letters [ "D" ]
+        letters [ "T" ]
        ]
        text [
         letters [ "'" ]
        ]
        text [
-        letters [ "S" ]
+        letters [ "s" ]
+       ]
+       text [
+        letters [ "" ]
        ]
        text [
         letters [ " " ]
        ]
        text [
-        letters [ " " ]
+        letters [ "" ]
        ]
        text [
-        letters [ "D" ]
+        letters [ "" ]
+       ]
+       text [
+        letters [ "" ]
+       ]
+       text [
+        letters [ "F" ]
+       ]
+       text [
+        letters [ "A" ]
        ]
        text [
         letters [ "R" ]
        ]
        text [
-        letters [ "E" ]
-       ]
-       text [
-        letters [ "A" ]
-       ]
-       text [
         letters [ "M" ]
        ]
        text [
-        letters [ "L" ]
+        letters [ "S" ]
        ]
        text [
-        letters [ "A" ]
+        letters [ "" ]
        ]
        text [
-        letters [ "N" ]
+        letters [ "" ]
        ]
        text [
-        letters [ "D" ]
+        letters [ "" ]
+       ]
+       text [
+        letters [ "" ]
        ]
       ]
       baseline [

@@ -1,0 +1,72 @@
+from direct.actor.Actor import Actor
+from panda3d.core import *
+from direct.task import Task
+import random
+
+suitTypes = {
+    'A': 'phase_3.5/models/char/suitA-mod.bam',
+    'B': 'phase_3.5/models/char/suitB-mod.bam',
+    'C': 'phase_3.5/models/char/suitC-mod.bam'
+}
+
+suitAnims = {
+    'neutral': 'phase_3.5/models/char/suitA-neutral.bam',
+    'walk': 'phase_3.5/models/char/suitA-walk.bam',
+}
+# Note: For simplicity using A anims for all for now, or I'd need to map them all.
+
+class Cog:
+    def __init__(self, type='A', head=None, name="Cog"):
+        self.type = type
+        self.node = Actor(suitTypes[type], {
+            'neutral': suitAnims['neutral'].replace('A', type),
+            'walk': suitAnims['walk'].replace('A', type)
+        })
+        
+        if head:
+            head_model = loader.loadModel(head)
+            # Find the head joint
+            head_joint = self.node.find('**/joint_head')
+            if head_joint.isEmpty():
+                head_joint = self.node.find('**/def_head')
+            head_model.reparentTo(head_joint)
+            
+        self.node.reparentTo(render)
+        self.node.loop('neutral')
+        self.name = name
+        
+    def setPos(self, x, y, z):
+        self.node.setPos(x, y, z)
+        
+    def setH(self, h):
+        self.node.setH(h)
+
+    def cleanup(self):
+        self.node.cleanup()
+        self.node.removeNode()
+
+class CogManager:
+    def __init__(self):
+        self.cogs = []
+        base.taskMgr.add(self.update, "CogManagerUpdate")
+        
+    def spawnCog(self, type='A', head=None, pos=(0,0,0)):
+        cog = Cog(type, head)
+        cog.setPos(*pos)
+        cog.orig_pos = Point3(*pos)
+        cog.target_pos = cog.orig_pos + Point3(random.uniform(-20, 20), random.uniform(-20, 20), 0)
+        self.cogs.append(cog)
+        return cog
+
+    def update(self, task):
+        dt = globalClock.getDt()
+        for cog in self.cogs:
+            dist = (cog.node.getPos() - cog.target_pos).length()
+            if dist > 1:
+                cog.node.lookAt(cog.target_pos)
+                cog.node.setPos(cog.node.getPos() + cog.node.getQuat().getForward() * 5 * dt)
+                if cog.node.getCurrentAnim() != 'walk':
+                    cog.node.loop('walk')
+            else:
+                cog.target_pos = cog.orig_pos + Point3(random.uniform(-50, 50), random.uniform(-50, 50), 0)
+        return Task.cont
