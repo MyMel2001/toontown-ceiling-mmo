@@ -5,15 +5,12 @@ LoadingZone = G["LoadingZone"]
 LoadingZone.define(146.381, 627.079, 109.502, 632.285, 6)
 
 from direct.actor.Actor import Actor
-from pandac.PandaModules import *
+from panda3d.core import *
 from direct.task import Task
 import math
 from math import pi, sin, cos
 from direct.showbase.ShowBase import ShowBase
-from direct.task import Task
 from direct.interval.IntervalGlobal import Sequence
-from pandac.PandaModules import Point3
-from pandac.PandaModules import *
 
 currentLand.currentLandModels[zones[zID]] = loader.loadModel("phase_9/models/cogHQ/SellbotHQExterior.bam")
 currentLand.currentLandModels[zones[zID]].reparentTo(render)

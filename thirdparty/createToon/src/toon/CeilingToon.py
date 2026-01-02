@@ -300,7 +300,7 @@ class Toon:
         elif torsoType == 'ld':
             return long_torso_skirt_anim_dict
         else:
-            raise "Strange torso type"
+            raise Exception("Strange torso type")
 
     def returnLegs(self):
         '''Returns the legs'''
@@ -316,7 +316,7 @@ class Toon:
         elif legSizeIndex == 's':
             return short_legs_anim_dict
         else:
-            raise "Strange Legs type"
+            raise Exception("Strange Legs type")
 
  # Clothing related functions
     def setShirtTexture(self, shirt):

@@ -3,7 +3,7 @@ from panda3d.core import TransparencyAttrib
 from panda3d.core import PandaNode
 from panda3d.core import TextNode
 from panda3d.core import Loader
-from pandac.PandaModules import NodePath
+from panda3d.core import NodePath
 from panda3d.core import DepthWriteAttrib
 
 def createNametag(name, bg=(1,1,1,.5), fg=(0,0,0,1), plateFile='panel.bam'):
@@ -57,8 +57,3 @@ def createNametag(name, bg=(1,1,1,.5), fg=(0,0,0,1), plateFile='panel.bam'):
 
     #return the nametag
     return nametag
-        
-
-
-
-

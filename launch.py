@@ -1,5 +1,5 @@
 from sys import argv
-from direct.directbase import DirectStart
+from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from direct.actor.Actor import Actor
 from direct.gui.DirectGui import *
@@ -15,6 +15,7 @@ import asyncio
 from networking import Networking
 from pick_a_toon_menu import PickAToonMenu
 
+base = ShowBase()
 base.disableMouse()
 
 G = get_builtins()
@@ -34,7 +35,8 @@ class currentLand:
     currentLandModels = {}
 
 def execfile(path):
-    exec(open(str(path)).read())
+    with open(str(path)) as f:
+        exec(f.read(), globals())
 
 global breakAllChecks
 breakAllChecks = False
