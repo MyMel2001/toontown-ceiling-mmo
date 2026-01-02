@@ -1,8 +1,16 @@
-currentLand.currentLandModels[zones[zID]] = loader.loadModel('phase_6/models/neighborhoods/minnies_melody_land.bam')
+G = get_builtins()
+dna_loader = G["dna_loader"]
+currentLand.currentLandModels[zones[zID]] = dna_loader.loadDNA('phase_6/dna/minnies_melody_land_sz.xml')
 currentLand.currentLandModels[zones[zID]].reparentTo(render)
 # Note for further creation: reparent everything after mainland to currentLand.currentLandModels[zones[zID]]
 currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 base.localAvatar.setPos(0,0,0)
+
+breakAllChecks = False
+G = get_builtins()
+LoadingZone = G["LoadingZone"]
+# Tunnel back to TTC
+LoadingZone.define(12, 107, -8, 112, 1)
 
 # note: normally one would use "awaitForZoneThread()" before each loading zone, but this isn't quite defined yet
 # until we actually make a loadingzone.

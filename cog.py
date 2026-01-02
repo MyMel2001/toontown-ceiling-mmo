@@ -31,6 +31,25 @@ class Cog:
                 head_joint = self.node.find('**/def_head')
             head_model.reparentTo(head_joint)
             
+            # Filter Cog head pieces
+            # Many cog head models contain all heads for that suit type.
+            # We hide all and show only the one matching the cog name.
+            for part in head_model.getChildren():
+                part.hide()
+            
+            cog_head_name = name.lower().replace(" ", "")
+            head_part = head_model.find(f"**/{cog_head_name}*")
+            if head_part.isEmpty():
+                # Fallback names
+                if cog_head_name == "flunky": head_part = head_model.find("**/flunky")
+                elif cog_head_name == "yesman": head_part = head_model.find("**/yesman")
+                # Add more mappings as needed or just show the first one
+            
+            if not head_part.isEmpty():
+                head_part.show()
+            elif head_model.getNumChildren() > 0:
+                head_model.getChild(0).show()
+            
         self.node.reparentTo(render)
         self.node.loop('neutral')
         self.name = name
@@ -50,8 +69,8 @@ class CogManager:
         self.cogs = []
         base.taskMgr.add(self.update, "CogManagerUpdate")
         
-    def spawnCog(self, type='A', head=None, pos=(0,0,0)):
-        cog = Cog(type, head)
+    def spawnCog(self, type='A', head=None, pos=(0,0,0), name="Cog"):
+        cog = Cog(type, head, name=name)
         cog.setPos(*pos)
         cog.orig_pos = Point3(*pos)
         cog.target_pos = cog.orig_pos + Point3(random.uniform(-20, 20), random.uniform(-20, 20), 0)

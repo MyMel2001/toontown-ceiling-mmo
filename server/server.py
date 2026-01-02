@@ -15,7 +15,7 @@ class ToontownServer(ShowBase):
         self.clients = {} # conn: {dna, pos, zone, name}
 
         port = 1913
-        self.tcpSocket = self.cManager.openTCPServerRcvPort(port)
+        self.tcpSocket = self.cManager.openTCPServerRendezvous(port, 5)
         if self.tcpSocket:
             self.cListener.addConnection(self.tcpSocket)
             print(f"Server started on port {port}")
@@ -60,6 +60,7 @@ class ToontownServer(ShowBase):
                 if type == 0: dna.append(it.getString())
                 elif type == 1: dna.append(it.getBool())
                 elif type == 2: dna.append(it.getUint8())
+                elif type == 3: dna.append(None)
             
             zone = it.getUint16()
             x, y, z = it.getFloat32(), it.getFloat32(), it.getFloat32()
@@ -130,6 +131,8 @@ class ToontownServer(ShowBase):
             elif isinstance(item, bool):
                 dg.addUint8(1)
                 dg.addBool(item)
+            elif item is None:
+                dg.addUint8(3)
             else:
                 dg.addUint8(2)
                 dg.addUint8(item)

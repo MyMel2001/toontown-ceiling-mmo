@@ -1,7 +1,15 @@
-currentLand.currentLandModels[zones[zID]] = loader.loadModel('phase_8/models/neighborhoods/donalds_dreamland.bam')
+G = get_builtins()
+dna_loader = G["dna_loader"]
+currentLand.currentLandModels[zones[zID]] = dna_loader.loadDNA('phase_8/dna/donalds_dreamland_sz.xml')
 currentLand.currentLandModels[zones[zID]].reparentTo(render)
 currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 base.localAvatar.setPos(0, 0, 0)
+
+breakAllChecks = False
+G = get_builtins()
+LoadingZone = G["LoadingZone"]
+# To TTC
+LoadingZone.define(-60, -200, -70, -190, 1)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/DL_nbrhood.ogg')
@@ -10,4 +18,4 @@ G["music"].play()
 
 from cog import CogManager
 base.cogMgr = CogManager()
-base.cogMgr.spawnCog('C', 'phase_3.5/models/char/suitC-heads.bam', (20, 20, 0))
+base.cogMgr.spawnCog('C', 'phase_3.5/models/char/suitC-heads.bam', (20, 20, 0), name="Bean Counter")

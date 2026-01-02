@@ -1,4 +1,6 @@
-currentLand.currentLandModels[zones[zID]] = loader.loadModel('phase_4/models/modules/street_full_silly.bam')
+G = get_builtins()
+dna_loader = G["dna_loader"]
+currentLand.currentLandModels[zones[zID]] = dna_loader.loadDNA('phase_5/dna/toontown_central_2100.xml')
 currentLand.currentLandModels[zones[zID]].reparentTo(render)
 currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 base.localAvatar.setPos(0, 0, 0)
@@ -10,4 +12,4 @@ G["music"].play()
 
 from cog import CogManager
 base.cogMgr = CogManager()
-base.cogMgr.spawnCog('A', 'phase_3.5/models/char/suitA-heads.bam', (0, 40, 0))
+base.cogMgr.spawnCog('A', 'phase_4/models/char/suitA-heads.bam', (0, 40, 0), name="Flunky")

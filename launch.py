@@ -14,6 +14,7 @@ import datetime
 import asyncio
 from networking import Networking
 from pick_a_toon_menu import PickAToonMenu
+from DNALoader import DNALoader
 
 base = ShowBase()
 base.disableMouse()
@@ -22,6 +23,33 @@ G = get_builtins()
 G["music"] = loader.loadSfx('phase_3/audio/bgm/c_theme.ogg')
 G["music"].setLoop(True)
 G["music"].play()
+
+# Initialize DNA Loader
+dna_loader = DNALoader()
+dna_loader.loadStorage('phase_4/dna/storage.xml')
+dna_loader.loadStorage('phase_4/dna/storage_TT.xml')
+dna_loader.loadStorage('phase_4/dna/storage_TT_sz.xml')
+dna_loader.loadStorage('phase_5/dna/storage_town.xml')
+dna_loader.loadStorage('phase_5/dna/storage_TT_town.xml')
+dna_loader.loadStorage('phase_6/dna/storage_DD.xml')
+dna_loader.loadStorage('phase_6/dna/storage_DD_sz.xml')
+dna_loader.loadStorage('phase_6/dna/storage_DD_town.xml')
+dna_loader.loadStorage('phase_6/dna/storage_MM.xml')
+dna_loader.loadStorage('phase_6/dna/storage_MM_sz.xml')
+dna_loader.loadStorage('phase_6/dna/storage_MM_town.xml')
+dna_loader.loadStorage('phase_6/dna/storage_GS.xml')
+dna_loader.loadStorage('phase_6/dna/storage_GS_sz.xml')
+dna_loader.loadStorage('phase_8/dna/storage_DG.xml')
+dna_loader.loadStorage('phase_8/dna/storage_DG_sz.xml')
+dna_loader.loadStorage('phase_8/dna/storage_DG_town.xml')
+dna_loader.loadStorage('phase_8/dna/storage_BR.xml')
+dna_loader.loadStorage('phase_8/dna/storage_BR_sz.xml')
+dna_loader.loadStorage('phase_8/dna/storage_BR_town.xml')
+dna_loader.loadStorage('phase_8/dna/storage_DL.xml')
+dna_loader.loadStorage('phase_8/dna/storage_DL_sz.xml')
+dna_loader.loadStorage('phase_8/dna/storage_DL_town.xml')
+dna_loader.loadStorage('phase_12/dna/storage_CC_sz.xml')
+G["dna_loader"] = dna_loader
 
 zones = ["Melodyland", "The Central", "Docks", "Garden", "Speedway", "Sellbot HQ Past 2021", "Test Trolley Game", "Toon Hall", "Cashbot HQ", "The Brrrgh", "Dreamland", "Silly Street"]
 
@@ -83,6 +111,18 @@ class LoadingZone:
         threading.Thread(target=LoadingZone.check, args=(x1, z1, x2, z2, zoneId), daemon=True).start()
 
 G["LoadingZone"] = LoadingZone
+
+def loadStreet(path, pos=(0, 0, 0), hpr=(0, 0, 0)):
+    if path.endswith('.xml'):
+        street = dna_loader.loadDNA(path)
+    else:
+        street = loader.loadModel(path)
+    street.reparentTo(render)
+    street.setPos(pos)
+    street.setHpr(hpr)
+    return street
+
+G["loadStreet"] = loadStreet
 
 def setWatchKey(key, input, keyMapName):
     def watchKey(active=True):
@@ -156,10 +196,18 @@ def start_game(toon_index):
     localAvatar = duckBody
     base.localAvatar = localAvatar
     
-    head = duckBody.findAllMatches('**/head*')
+    head_joint = duckBody.find('**/def_head')
+    if head_joint.isEmpty():
+        head_joint = duckBody.find('**/joint_head')
+    
     nametag = createNametag(toonNameArray[toon_index], (1,1,1,.5), (0,0,1,1))
     nametag.setPos(0,0,2)
-    nametag.reparentTo(head[0])
+    if not head_joint.isEmpty():
+        nametag.reparentTo(head_joint)
+    else:
+        head = duckBody.findAllMatches('**/head*')
+        if head:
+            nametag.reparentTo(head[0])
 
     duckBody.reparentTo(render)
     offset = 3.2375

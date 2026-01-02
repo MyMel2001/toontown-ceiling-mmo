@@ -88,6 +88,7 @@ class Toon:
 
         self.toonActor.attach('head', 'torso', 'def_head')
         self.toonActor.attach('torso', 'legs', 'joint_hips')
+        self.toonActor.showPart('head')
 
         self.toonActor.reparentTo(render)
         self.toonActor.setPos(2, 35, 0)
@@ -187,56 +188,16 @@ class Toon:
     def updateHeadColor(self, color_to_set):
         '''Updates the Toon's head color'''
         self.head_color = color_to_set
-
-        if self.species == 'd':
-            self.toonActor.find(
-                '**/head').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-front').setColor(colorsList[self.head_color])
-        # Gotta account for Deers only having one head type.
-        elif self.species == 'de':
-            self.toonActor.find(
-                '**/*ears-short').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-short').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-front-short').setColor(colorsList[self.head_color])
-        elif self.species == 'du':  # Gotta account for ducks not having ears
-            self.toonActor.find(
-                '**/*head-short').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-front-short').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-long').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-front-long').setColor(colorsList[self.head_color])
-        elif self.species == 'ri':  # Riggy only has one head type.
-            self.toonActor.find(
-                '**/*ears').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-front').setColor(colorsList[self.head_color])
-        elif self.species == 'mo':  # Monkeys can't get their ears colored.
-            self.toonActor.find(
-                '**/*head-short').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-front-short').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-long').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-front-long').setColor(colorsList[self.head_color])
-        else:
-            self.toonActor.find(
-                '**/*ears-short').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-short').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-front-short').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-long').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*ears-long').setColor(colorsList[self.head_color])
-            self.toonActor.find(
-                '**/*head-front-long').setColor(colorsList[self.head_color])
+        color = colorsList[self.head_color]
+        
+        # Color all head pieces
+        for part in self.toonActor.findAllMatches('**/head*'):
+            part.setColor(color)
+        
+        # Color all ear pieces (except for monkeys)
+        if self.species != 'mo':
+            for part in self.toonActor.findAllMatches('**/ears*'):
+                part.setColor(color)
 
     def updateTorso(self, torso_type):
         '''Updates the torso type'''

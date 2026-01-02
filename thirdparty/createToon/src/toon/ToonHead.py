@@ -67,6 +67,7 @@ class ToonHead:
 
     def generateHeadDetails(self, headModel, species, head_type, has_eyelashes):
         '''Based on the species and head type, changes the head detail'''
+        headModel.show()
         toonType = species + head_type # toonType is a string, basically returns something like "cls" or "cals"
 
         # Bears
@@ -1052,6 +1053,22 @@ class ToonHead:
             headModel.find('**/joint_pupilL_short').show()
             headModel.find('**/joint_pupilR_short').show()
             headModel.find('**/muzzle-short-neutral').show()    
+        
+        # Dogs
+        elif species == 'd':
+            # Dogs already load their specific head model, but we should ensure the correct pieces are shown.
+            headModel.findAllMatches('**/head*').show()
+            
+            # Dogs have muzzle-long-neutral or muzzle-short-neutral depending on the model loaded
+            headModel.findAllMatches('**/muzzle*').show()
+            headModel.findAllMatches('**/eyes*').show()
+
+        # Riggy
+        elif species == 'ri':
+            headModel.findAllMatches('**/head*').show()
+            headModel.findAllMatches('**/ears*').show()
+            headModel.findAllMatches('**/muzzle*').show()
+            headModel.findAllMatches('**/eyes*').show()
 
         # Generate the eyelashes if wanted
         if has_eyelashes:
@@ -1127,5 +1144,3 @@ class ToonHead:
 
     def removeHead(self):
         self.head_model.getChildren().detach()
-
-
