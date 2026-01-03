@@ -33,6 +33,7 @@ A Toontown Private Server made of mostly freely available components. Code is mo
 ## Known Major Issues.
 
 * ***DNA Loader*** Fonts in Playground/Street/CogHQ DNA are set to Mickey font instead of the corresponding fonts.
+* ***Loading Zones*** Loading zone positions are WAY off in most areas.
 
 ## License
 MIT (Modified)
