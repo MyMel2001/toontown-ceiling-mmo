@@ -70,8 +70,10 @@ class ToontownServer(ShowBase):
     def spawnCogsForZone(self, zoneId):
         if zoneId not in self.cogs:
             self.cogs[zoneId] = {}
-            # Only spawn cogs in streets and Cog HQs
-            # Playgrounds: 0-4, 9-10; Misc: 6-7
+        
+        # Only spawn cogs if the zone is empty and not a safe zone
+        if not self.cogs[zoneId]:
+            # Playgrounds/Safe Zones: 0-4, 9-10; Misc: 6-7
             if zoneId in [0, 1, 2, 3, 4, 6, 7, 9, 10]:
                 return
 
@@ -81,6 +83,9 @@ class ToontownServer(ShowBase):
                 self.spawnCog(zoneId)
 
     def spawnCog(self, zoneId):
+        if zoneId not in self.cogs:
+            self.cogs[zoneId] = {}
+            
         cogId = self.nextCogId
         self.nextCogId += 1
         
@@ -115,7 +120,10 @@ class ToontownServer(ShowBase):
         # Broadcast to all players in zone
         self.broadcastCogSpawn(zoneId, cogId)
 
-    def broadcastCogSpawn(self, zoneId, cogId):
+    def sendCogSpawn(self, conn, zoneId, cogId):
+        if zoneId not in self.cogs or cogId not in self.cogs[zoneId]:
+            return
+            
         cog = self.cogs[zoneId][cogId]
         dg = NetDatagram()
         dg.addUint8(7) # COG SPAWN
@@ -127,10 +135,12 @@ class ToontownServer(ShowBase):
         dg.addFloat32(cog['pos'][1])
         dg.addFloat32(cog['pos'][2])
         dg.addFloat32(cog['h'])
-        
+        self.cWriter.send(dg, conn)
+
+    def broadcastCogSpawn(self, zoneId, cogId):
         for conn, data in self.clients.items():
             if data['zone'] == zoneId:
-                self.cWriter.send(dg, conn)
+                self.sendCogSpawn(conn, zoneId, cogId)
 
     def broadcastCogPos(self, zoneId):
         if zoneId not in self.cogs: return
@@ -230,8 +240,9 @@ class ToontownServer(ShowBase):
                     self.sendSpawn(conn, other_conn, data)
             
             # Send current cogs to new player
-            for cogId in self.cogs.get(zone, {}):
-                self.broadcastCogSpawn(zone, cogId)
+            if zone in self.cogs:
+                for cogId in self.cogs[zone]:
+                    self.sendCogSpawn(conn, zone, cogId)
 
             # Broadcast new player to others
             for other_conn in self.clients:
@@ -269,8 +280,9 @@ class ToontownServer(ShowBase):
                         self.sendSpawn(other_conn, conn, self.clients[conn])
                 
                 # Send current cogs to player
-                for cogId in self.cogs.get(new_zone, {}):
-                    self.broadcastCogSpawn(new_zone, cogId)
+                if new_zone in self.cogs:
+                    for cogId in self.cogs[new_zone]:
+                        self.sendCogSpawn(conn, new_zone, cogId)
 
         elif msgID == 4: # CHAT
             if conn in self.clients:
