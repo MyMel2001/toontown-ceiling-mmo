@@ -24,6 +24,7 @@ class MakeAToon:
                          None, None, 0, None, None, None, "Neutral", True, False)
         self.toon.toonActor.reparentTo(self.mainFrame)
         self.toon.toonActor.setPos(0, 5, -0.5)
+        self.toon.toonActor.setScale(.24,.24,.24)
         self.toon.toonActor.setH(180)
         
         # UI
@@ -62,6 +63,7 @@ class MakeAToon:
                          None, None, 0, None, None, None, "Neutral", True, False)
         self.toon.toonActor.reparentTo(self.mainFrame)
         self.toon.toonActor.setPos(0, 5, -0.5)
+        self.toon.toonActor.setScale(.24,.24,.24)
         self.toon.toonActor.setH(180)
 
     def done(self):
@@ -71,6 +73,7 @@ class MakeAToon:
                self.color, self.color, self.color, self.color, 
                "Cattlelog Shirt 1", "Catalog Pants 1", None, "White", "White",
                None, None, 0, None, None, None, "Neutral", True, False]
+        self.toon.toonActor.setScale(1,1,1)
         
         toonDnaArray.append(dna)
         toonNameArray.append(name)

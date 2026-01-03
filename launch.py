@@ -58,7 +58,7 @@ dna_loader.loadStorage('phase_8/dna/storage_DL_town.xml')
 dna_loader.loadStorage('phase_12/dna/storage_CC_sz.xml')
 G["dna_loader"] = dna_loader
 
-zones = ["Melodyland", "The Central", "Docks", "Garden", "Speedway", "Sellbot HQ Past 2021", "Test Trolley Game", "Toon Hall", "Cashbot HQ", "The Brrrgh", "Dreamland", "Silly Street", "Loopy Lane", "Punchline Place", "Elm Street", "Tenor Terrace", "Alto Avenue", "Lullaby Lane", "Seaweed Street", "Barnacle Boulevard", "Lighthouse Lane", "Labyrinth Lane", "Maple Street", "Walrus Way", "Sleet Street", "Polar Place", "Lullaby Lane DL", "Pajama Place"]
+zones = ["Melodyland", "The Central", "Docks", "Garden", "Speedway", "Sellbot HQ Past 2021", "Test Trolley Game", "Toon Hall", "Cashbot HQ", "The Brrrgh", "Dreamland", "Punchline Place", "Silly Street", "Loopy Lane", "Elm Street", "Tenor Terrace", "Alto Avenue", "Lullaby Lane", "Seaweed Street", "Barnacle Boulevard", "Lighthouse Lane", "Labyrinth Lane", "Maple Street", "Walrus Way", "Sleet Street", "Polar Place", "Lullaby Lane DL", "Pajama Place"]
 
 def getZoneName(zoneId):
     if zoneId < len(zones):
