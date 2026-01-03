@@ -153,6 +153,12 @@ class Networking:
         return Task.again
 
     def changeZone(self, newZone):
+        # Clear remote players when changing zones
+        for player_id in list(self.remotePlayers.keys()):
+            self.remotePlayers[player_id].toonActor.cleanup()
+            self.remotePlayers[player_id].toonActor.removeNode()
+            del self.remotePlayers[player_id]
+        
         dg = NetDatagram()
         dg.addUint8(3)
         dg.addUint16(newZone)

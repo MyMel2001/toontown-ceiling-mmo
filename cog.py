@@ -5,9 +5,9 @@ import random
 from thirdparty.nametag.toonNametag import createNametag
 
 suitTypes = {
-    'A': 'phase_4/models/char/suitA-mod.bam',
-    'B': 'phase_4/models/char/suitB-mod.bam',
-    'C': 'phase_4/models/char/suitC-mod.bam'
+    'A': 'phase_3.5/models/char/suitA-mod.bam',
+    'B': 'phase_3.5/models/char/suitB-mod.bam',
+    'C': 'phase_3.5/models/char/suitC-mod.bam'
 }
 
 suitAnims = {
@@ -19,9 +19,19 @@ suitAnims = {
 class Cog:
     def __init__(self, type='A', head=None, name="Cog"):
         self.type = type
+        
+        # Determine correct animation paths based on type
+        # Suit A and B are usually in phase_4, C is in phase_3.5
+        neutral_anim = suitAnims['neutral'].replace('A', type)
+        walk_anim = suitAnims['walk'].replace('A', type)
+        
+        if type == 'C':
+            neutral_anim = neutral_anim.replace('phase_4', 'phase_3.5')
+            walk_anim = walk_anim.replace('phase_4', 'phase_3.5')
+            
         self.node = Actor(suitTypes[type], {
-            'neutral': suitAnims['neutral'].replace('A', type),
-            'walk': suitAnims['walk'].replace('A', type)
+            'neutral': neutral_anim,
+            'walk': walk_anim
         })
         
         # Add nametag
@@ -43,8 +53,12 @@ class Cog:
         if head:
             # Fix: Ensure correct path for heads (many are in phase_4, some in phase_3.5)
             head_path = head
-            if "phase_3.5" in head_path:
+            
+            # Cog A and B heads are in phase_4, C heads are in phase_3.5
+            if type == 'A' or type == 'B':
                 head_path = head_path.replace("phase_3.5", "phase_4")
+            elif type == 'C':
+                head_path = head_path.replace("phase_4", "phase_3.5")
             
             try:
                 head_model = loader.loadModel(head_path)

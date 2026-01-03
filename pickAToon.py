@@ -28,7 +28,9 @@ def createNPC(dnaArray,x,y,z,h,p,r,name):
 
 def destroyNPCS():
     for element in npcArray:
-        element.toonActor.detach_node()
+        if element.toonActor and not element.toonActor.isEmpty():
+            element.toonActor.removeNode()
+    npcArray.clear()
 
 def pickAToon(num):
     global pickedToonArray

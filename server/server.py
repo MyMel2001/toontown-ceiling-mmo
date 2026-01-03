@@ -44,11 +44,30 @@ class ToontownServer(ShowBase):
         return Task.cont
 
     def readTask(self, task):
+        while self.cManager.resetConnectionAvailable():
+            conn = PointerToConnection()
+            if self.cManager.getResetConnection(conn):
+                conn = conn.p()
+                self.handleDisconnect(conn)
+                self.cReader.removeConnection(conn)
+
         while self.cReader.dataAvailable():
             datagram = NetDatagram()
             if self.cReader.getData(datagram):
                 self.processDatagram(datagram)
         return Task.cont
+
+    def handleDisconnect(self, conn):
+        if conn in self.clients:
+            name = self.clients[conn]['name']
+            zone = self.clients[conn]['zone']
+            print(f"Player {name} disconnected")
+            self.broadcastDespawn(conn, zone)
+            del self.clients[conn]
+        if conn in self.activeConnections:
+            self.activeConnections.remove(conn)
+        if conn in self.connIds:
+            del self.connIds[conn]
 
     def processDatagram(self, datagram):
         conn = datagram.getConnection()

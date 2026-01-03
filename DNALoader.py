@@ -2,6 +2,8 @@ import xml.etree.ElementTree as ET
 from panda3d.core import *
 from direct.actor.Actor import Actor
 
+global scene
+
 class DNALoader:
     def __init__(self):
         self.storage = {}
@@ -201,8 +203,15 @@ class DNALoader:
         if text_node is not None and text_node.text:
             tn = TextNode('dna_text')
             tn.setText(text_node.text)
-            # Use a default font if available, or just use the default
-            # Toontown often uses mickey.ttf
+            
+            # Load default Toontown font
+            try:
+                font = loader.loadFont('phase_3/fonts/MickeyFont.ttf')
+                if font:
+                    tn.setFont(font)
+            except:
+                pass
+
             np = baseline_node.attachNewNode(tn)
             np.setScale(2) # Default scale for text
         

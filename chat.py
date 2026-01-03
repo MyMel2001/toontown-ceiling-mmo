@@ -15,7 +15,7 @@ class ChatManager:
         
         self.entry = DirectEntry(
             scale=0.05,
-            pos=(-1.2, 0, -0.9),
+            pos=(0, 0, 0.1),
             numLines=1,
             focus=0,
             command=self.sendChat,

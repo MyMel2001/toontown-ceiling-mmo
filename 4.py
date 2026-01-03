@@ -5,8 +5,6 @@ currentLand.currentLandModels[zones[zID]].reparentTo(render)
 currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 base.localAvatar.setPos(196,322.864,0)
 
-breakAllChecks = False
-G = get_builtins()
 LoadingZone = G["LoadingZone"]
 # To TTC
 LoadingZone.define(-15, 83, -25, 73, 1)

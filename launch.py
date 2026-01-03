@@ -58,7 +58,12 @@ dna_loader.loadStorage('phase_8/dna/storage_DL_town.xml')
 dna_loader.loadStorage('phase_12/dna/storage_CC_sz.xml')
 G["dna_loader"] = dna_loader
 
-zones = ["Melodyland", "The Central", "Docks", "Garden", "Speedway", "Sellbot HQ Past 2021", "Test Trolley Game", "Toon Hall", "Cashbot HQ", "The Brrrgh", "Dreamland", "Silly Street"]
+zones = ["Melodyland", "The Central", "Docks", "Garden", "Speedway", "Sellbot HQ Past 2021", "Test Trolley Game", "Toon Hall", "Cashbot HQ", "The Brrrgh", "Dreamland", "Silly Street", "Loopy Lane", "Punchline Place", "Elm Street", "Tenor Terrace", "Alto Avenue", "Lullaby Lane", "Seaweed Street", "Barnacle Boulevard", "Lighthouse Lane", "Labyrinth Lane", "Maple Street", "Walrus Way", "Sleet Street", "Polar Place", "Lullaby Lane DL", "Pajama Place"]
+
+def getZoneName(zoneId):
+    if zoneId < len(zones):
+        return zones[zoneId]
+    return f"Zone {zoneId}"
 
 global duckBody, localAvatar, zID, battleMgr
 duckBody = None
@@ -73,56 +78,78 @@ def execfile(path):
     with open(str(path)) as f:
         exec(f.read(), globals())
 
-global breakAllChecks
-breakAllChecks = False
+class LoadingZoneManager:
+    def __init__(self):
+        self.zones = []
+        base.taskMgr.add(self.update, "loadingZoneManagerUpdate")
+
+    def addZone(self, x1, y1, x2, y2, zoneId):
+        minX = min(x1, x2)
+        maxX = max(x1, x2)
+        minY = min(y1, y2)
+        maxY = max(y1, y2)
+        self.zones.append((minX, minY, maxX, maxY, zoneId))
+
+    def clear(self):
+        self.zones = []
+
+    def update(self, task):
+        if localAvatar:
+            x, y = localAvatar.getX(), localAvatar.getY()
+            for z in list(self.zones):
+                minX, minY, maxX, maxY, zoneId = z
+                if minX <= x <= maxX and minY <= y <= maxY:
+                    self.clear()
+                    loadZone(zoneId)
+                    break
+        return Task.cont
+
+loadingZoneMgr = LoadingZoneManager()
+G["loadingZoneMgr"] = loadingZoneMgr
 
 def loadZone(zoneId):
-    global breakAllChecks, zID, loading_queue
+    global breakAllChecks, zID
     breakAllChecks = True
-    loading_queue = [] # Clear queue on zone change
     
-    try:
-        if zones[zID] in currentLand.currentLandModels:
-            currentLand.currentLandModels[zones[zID]].removeNode()
-    except:
-        pass
+    # Clear loading queue
+    loading_queue.clear()
+    
+    # Clean up managed entities
+    destroyNPCS()
+    if hasattr(base, "cogMgr"):
+        for cog in base.cogMgr.cogs:
+            cog.cleanup()
+        base.cogMgr.cogs = []
+    
+    if hasattr(base, "net"):
+        base.net.changeZone(zoneId)
+        
+    # Aggressively cleanup everything else in render EXCEPT the local avatar
+    if duckBody:
+        duckBody.detachNode()
+    
+    for child in list(render.getChildren()):
+        child.removeNode()
+    
+    if duckBody:
+        duckBody.reparentTo(render)
+    
+    currentLand.currentLandModels.clear()
     
     old_zID = zID
     zID = zoneId
     G["pZID"] = old_zID
     
     try:
-        destroyNPCS()
-        if hasattr(base, "cogMgr"):
-            for cog in base.cogMgr.cogs:
-                cog.cleanup()
-            base.cogMgr.cogs = []
-            
-        # Instead of executing directly, we'll let the script queue its loads
         execfile(f"{zID}.py")
-        
-        if hasattr(base, "net"):
-            base.net.changeZone(zID)
     except Exception as e:
         print(f"Error loading zone {zID}: {e}")
-
 G["loadZone"] = loadZone
 
 class LoadingZone:
     @staticmethod
-    def check(x1, z1, x2, z2, zoneId):
-        global breakAllChecks
-        while not breakAllChecks:
-            if localAvatar:
-                x, y = localAvatar.getX(), localAvatar.getY()
-                if x2 <= x <= x1 and z1 <= y <= z2:
-                    loadZone(zoneId)
-                    break
-            threading.Event().wait(0.5)
-
-    @staticmethod
-    def define(x1, z1, x2, z2, zoneId):
-        threading.Thread(target=LoadingZone.check, args=(x1, z1, x2, z2, zoneId), daemon=True).start()
+    def define(x1, y1, x2, y2, zoneId):
+        loadingZoneMgr.addZone(x1, y1, x2, y2, zoneId)
 
 G["LoadingZone"] = LoadingZone
 
@@ -148,19 +175,37 @@ def queue_load(func, *args):
     if not is_loading:
         base.taskMgr.add(process_loading_queue, "process_loading_queue")
 
-def actual_load_street(path, pos, hpr):
+def actual_load_street(path, pos, hpr, zone_key=None):
+    print("Unloading previous place....")
+    # Aggressively cleanup everything else in render EXCEPT the local avatar
+    if duckBody:
+        duckBody.detachNode()
+    
+    for child in list(render.getChildren()):
+        child.removeNode()
+    
+    if duckBody:
+        duckBody.reparentTo(render)
+    
+    currentLand.currentLandModels.clear()
     print(f"Progressive loading: {path}")
     if path.endswith('.xml'):
         street = dna_loader.loadDNA(path)
     else:
         street = loader.loadModel(path)
     if street:
+        if zone_key:
+            currentLand.currentLandModels[zone_key] = street
+        else:
+            # If no key, we should still track it to remove it later
+            # Using path as a fallback key
+            currentLand.currentLandModels[path] = street
         street.reparentTo(render)
         street.setPos(pos)
         street.setHpr(hpr)
 
-def loadStreet(path, pos=(0, 0, 0), hpr=(0, 0, 0)):
-    queue_load(actual_load_street, path, pos, hpr)
+def loadStreet(path, pos=(0, 0, 0), hpr=(0, 0, 0), zone_key=None):
+    queue_load(actual_load_street, path, pos, hpr, zone_key)
     return None # Return None because it's async now
 
 G["loadStreet"] = loadStreet
