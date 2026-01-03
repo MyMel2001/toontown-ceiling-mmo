@@ -1,11 +1,9 @@
 from panda3d.core import *
-from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 import sys
 
-class ToontownServer(ShowBase):
+class ToontownServer():
     def __init__(self):
-        ShowBase.__init__(self)
         self.cManager = QueuedConnectionManager()
         self.cListener = QueuedConnectionListener(self.cManager, 0)
         self.cReader = QueuedConnectionReader(self.cManager, 0)
