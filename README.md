@@ -25,9 +25,8 @@ A Toontown Private Server made of mostly freely available components. Code is mo
 * Chat (uncensored)
 * Trolley (WIP)
 
-## What needs some work
+## Future features...
 
-* Positioning of loading zones.
 * Add Random Trolley games(?)
 
 ## Known Major Issues.
