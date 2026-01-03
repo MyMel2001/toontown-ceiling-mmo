@@ -4,9 +4,10 @@ from direct.task import Task
 from pickAToon import get_builtins
 from thirdparty.createToon.src.toon.CeilingToon import Toon
 from thirdparty.nametag.toonNametag import createNametag
+import os
 
 class Networking:
-    def __init__(self, host="127.0.0.1", port=1913):
+    def __init__(self, host=os.getenv("IP"), port=1913):
         self.cManager = QueuedConnectionManager()
         self.cReader = QueuedConnectionReader(self.cManager, 0)
         self.cWriter = ConnectionWriter(self.cManager, 0)
