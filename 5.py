@@ -2,7 +2,8 @@ base.localAvatar.setPos(67.5842,-340.653,100.819)
 
 G = get_builtins()
 LoadingZone = G["LoadingZone"]
-LoadingZone.define(146.381, 627.079, 109.502, 632.285, 6)
+# Sellbot HQ Tunnel to Daisy's Garden
+LoadingZone.define(5, -5, -5, 5, 3)
 
 from direct.actor.Actor import Actor
 from panda3d.core import *

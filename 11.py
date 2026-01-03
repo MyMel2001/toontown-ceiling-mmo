@@ -15,9 +15,9 @@ base.localAvatar.setPos(0, 20, 0)
 # Tunnels in Silly Street
 LoadingZone = G["LoadingZone"]
 # Back to TTC Playground
-LoadingZone.define(-20, -10, 20, 10, 1)
+LoadingZone.define(-5, -5, 5, 5, 1)
 # Forward to Melodyland Playground (end of street)
-LoadingZone.define(-20, 580, 20, 620, 0)
+LoadingZone.define(-5, 595, 5, 605, 0)
 
 # Setup tunnel at end of street to Melodyland
 # Coordinates for MML tunnel in TTC 2100 are approx (0, 600, 0)

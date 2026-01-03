@@ -7,16 +7,15 @@ currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 base.localAvatar.setPos(0,0,0)
 
 LoadingZone = G["LoadingZone"]
-# Tunnel back to TTC
-# Tunnel back to TTC now goes through Silly Street (11)
-LoadingZone.define(27, 81, 13, 67, 11)
+# Silly Street (11) - Tunnel back to TTC
+LoadingZone.define(32, 73.75, 22, 83.75, 11)
 
-# Tenor Terrace (4100)
-LoadingZone.define(-18, -203, -32, -217, 15)
-# Alto Avenue (4200)
-LoadingZone.define(87, 177, 73, 163, 16)
-# Baritone Boulevard (4300)
-LoadingZone.define(-163, 52, -177, 38, 17)
+# Tenor Terrace (4340 -> 15)
+LoadingZone.define(-20, -204.95, -30, -214.95, 15)
+# Alto Avenue (4127 -> 16)
+LoadingZone.define(85, 164.99, 75, 174.99, 16)
+# Baritone Boulevard (4222 -> 17)
+LoadingZone.define(-165.01, 49.58, -175.01, 39.58, 17)
 
 global isCurrentZone
 isCurrentZone = True

@@ -12,7 +12,7 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to MML Playground
-LoadingZone.define(-20, -10, 20, 10, 0)
+LoadingZone.define(-5, -5, 5, 5, 0)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/WW_sz.ogg')

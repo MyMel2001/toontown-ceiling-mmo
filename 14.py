@@ -10,9 +10,9 @@ base.localAvatar.setPos(0, 20, 0)
 # Tunnels in Elm Street
 LoadingZone = G["LoadingZone"]
 # Back to DG Playground
-LoadingZone.define(-20, -10, 20, 10, 3)
+LoadingZone.define(-5, -5, 5, 5, 3)
 # Forward to TTC (Punchline Place)
-LoadingZone.define(-20, 580, 20, 620, 13)
+LoadingZone.define(-5, 595, 5, 605, 1)
 
 # Load tunnel back to DG
 # G["loadStreet"]('phase_8/dna/daisys_garden_sz.xml', pos=(0,0,0))

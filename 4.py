@@ -6,8 +6,8 @@ currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 base.localAvatar.setPos(196,322.864,0)
 
 LoadingZone = G["LoadingZone"]
-# To TTC
-LoadingZone.define(-15, 83, -25, 73, 1)
+# Goofy Speedway Tunnel to TTC
+LoadingZone.define(-15, 83.1, -25, 73.1, 1)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GS_Race_BKR.ogg')

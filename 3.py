@@ -9,15 +9,14 @@ tunnelA.setPos(0, 0, 0.025)
 base.localAvatar.setPos(22.9513,60.1588,0.025)
 
 LoadingZone = G["LoadingZone"]
-# To Punchline Place/TTC (through Elm Street 14)
-LoadingZone.define(194, 199, 180, 185, 14)
-
-# Labyrinth Lane (5200)
-LoadingZone.define(-102, 300, -116, 286, 21)
-# Maple Street (5300)
-LoadingZone.define(-53, -88, -67, -102, 22)
+# Elm Street (5102 -> 14)
+LoadingZone.define(182.08, 186.78, 192.08, 196.78, 14)
+# Labyrinth Lane (5201 -> 21)
+LoadingZone.define(-104.48, 287.95, -114.48, 297.95, 21)
+# Oak Street (5301 -> 22)
+LoadingZone.define(-55.12, -89.82, -65.12, -99.82, 22)
 # To Sellbot HQ
-LoadingZone.define(3.6083, -1.4502, -14.5347, 9.84779, 5)
+LoadingZone.define(5, -5, -5, 5, 5)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GARDEN_nbrhood.ogg')

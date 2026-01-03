@@ -7,10 +7,10 @@ base.localAvatar.setPos(0, 0, 0)
 
 G = get_builtins()
 LoadingZone = G["LoadingZone"]
-# To Lullaby Lane (9100)
-LoadingZone.define(-58, -188, -72, -202, 26)
-# To Pajama Place (9200)
-LoadingZone.define(62, 202, 48, 188, 27)
+# Lullaby Lane (9101 -> 26)
+LoadingZone.define(-60.2, -190.2, -70.2, -200.2, 26)
+# Pajama Place (9201 -> 27)
+LoadingZone.define(60, 190, 50, 200, 27)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/DL_nbrhood.ogg')

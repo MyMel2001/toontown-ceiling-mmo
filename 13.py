@@ -14,9 +14,9 @@ base.localAvatar.setPos(0, 20, 0)
 # Tunnels in Punchline Place
 LoadingZone = G["LoadingZone"]
 # Back to TTC Playground
-LoadingZone.define(-20, -10, 20, 10, 1)
+LoadingZone.define(-5, -5, 5, 5, 1)
 # Forward to Daisy's Garden (end of street)
-LoadingZone.define(-20, 580, 20, 620, 3)
+LoadingZone.define(-5, 595, 5, 605, 3)
 
 # Setup tunnel at end of street to Daisy's Garden
 # G["loadStreet"]('phase_8/dna/daisys_garden_sz.xml', pos=(0, 600, 0), zone_key="next_sz")
