@@ -1,0 +1,1 @@
+bash linux-launch-server.sh > ttserver.log 2>&1 &
