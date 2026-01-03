@@ -18,6 +18,7 @@ from networking import Networking
 from pick_a_toon_menu import PickAToonMenu
 from DNALoader import DNALoader
 import os
+import math
 
 base = ShowBase()
 base.disableMouse()
@@ -144,6 +145,8 @@ def loadZone(zoneId):
     
     # Clean up managed entities
     destroyNPCS()
+    if hasattr(base, "battleMgr") and base.battleMgr.currentBattle:
+        base.battleMgr.currentBattle.cleanup()
     if hasattr(base, "cogMgr"):
         base.cogMgr.cleanup()
     
@@ -173,6 +176,7 @@ def loadZone(zoneId):
     except Exception as e:
         print(f"Error loading zone {zID}: {e}")
 G["loadZone"] = loadZone
+base.loadZone = loadZone
 
 def spawnOneIceCream(task=None):
     if not hasattr(base, "iceCreams"):
@@ -180,8 +184,11 @@ def spawnOneIceCream(task=None):
         
     playground_zones = [0, 1, 2, 3, 4, 9, 10]
     if zID in playground_zones and len(base.iceCreams) < 10:
-        x = random.uniform(-100, 100)
-        y = random.uniform(-100, 100)
+        # Spawn ice creams further away from the center to avoid immediate pickup on teleport
+        angle = random.uniform(0, 2 * math.pi)
+        dist = random.uniform(20, 100)
+        x = math.cos(angle) * dist
+        y = math.sin(angle) * dist
         ic = loader.loadModel("phase_4/models/props/icecream.bam")
         ic.reparentTo(render)
         ic.setPos(x, y, 0.5)
@@ -201,7 +208,7 @@ def spawnIceCreams():
             spawnOneIceCream()
 
 def iceCreamTask(task):
-    if localAvatar:
+    if localAvatar and localAvatar.hp > 0:
         for ic in list(base.iceCreams):
             if ic.isEmpty():
                 continue
@@ -250,6 +257,8 @@ class LaffMeter(DirectFrame):
 
     def updateLaff(self):
         if not localAvatar: return
+        if localAvatar.hp < 0:
+            localAvatar.hp = 0
         hp = localAvatar.hp
         maxHp = localAvatar.maxHp
         self.hpLabel['text'] = str(int(hp))
@@ -258,12 +267,32 @@ class LaffMeter(DirectFrame):
             self.hpLabel['text_fg'] = (1, 0, 0, 1) # Red
             if not self.isSad:
                 self.isSad = True
-                base.loadZone(getPlaygroundForZone(zID))
+                # Set HP to 0 explicitly to ensure it stays 0 during teleport
+                localAvatar.hp = 0
+                Sequence(
+                    Wait(0.5),
+                    Func(base.loadZone, getPlaygroundForZone(zID)),
+                    Wait(0.1),
+                    Func(self.healAfterSad)
+                ).start()
         else:
             self.hpLabel['text_fg'] = (0, 1, 0, 1) # Green
             self.isSad = False
+        
+        self.updateLaffMeter()
 
+    def healAfterSad(self):
+        # In Toontown, you are healed to 1 HP after going sad and reaching playground
+        if localAvatar.hp <= 0:
+            localAvatar.hp = 1
+            self.updateLaff()
+
+    def updateLaffMeter(self):
+        if not localAvatar: return
+        hp = localAvatar.hp
+        maxHp = localAvatar.maxHp
         ratio = float(hp) / maxHp if maxHp > 0 else 0
+        
         self.eyes.show()
         self.smile.hide()
         self.open_smile.hide()
@@ -469,7 +498,7 @@ def start_game(toon_index):
     DirectButton(text=("Back to TTC", "Click", "...", "disabled"), scale=.08, pos=(0, -.5, .5), command=lambda: loadZone(1))
 
 def battleTriggerTask(task):
-    if not localAvatar or not hasattr(base, "cogMgr") or not hasattr(base, "battleMgr"):
+    if not localAvatar or localAvatar.hp <= 0 or not hasattr(base, "cogMgr") or not hasattr(base, "battleMgr"):
         return Task.cont
     
     if base.battleMgr.currentBattle:

@@ -195,6 +195,7 @@ class ToontownServer(ShowBase):
             zone = self.clients[conn]['zone']
             print(f"Player {name} disconnected")
             self.broadcastDespawn(conn, zone)
+            self.releaseCogsOwnedBy(conn)
             del self.clients[conn]
         if conn in self.activeConnections:
             self.activeConnections.remove(conn)
@@ -269,6 +270,7 @@ class ToontownServer(ShowBase):
                 
                 # Despawn from old zone
                 self.broadcastDespawn(conn, old_zone)
+                self.releaseCogsOwnedBy(conn)
                 
                 # Spawn cogs for new zone if not already spawned
                 self.spawnCogsForZone(new_zone)
@@ -411,6 +413,16 @@ class ToontownServer(ShowBase):
         for other_conn in self.clients:
             if self.clients[other_conn]['zone'] == zone:
                 self.cWriter.send(dg, other_conn)
+
+    def releaseCogsOwnedBy(self, conn):
+        if conn not in self.connIds: return
+        toonId = self.connIds[conn]
+        for zoneId in self.cogs:
+            for cogId, cog in self.cogs[zoneId].items():
+                if cog.get('inBattle') and cog.get('toonId') == toonId:
+                    print(f"Releasing cog {cogId} from battle with toon {toonId}")
+                    cog['inBattle'] = False
+                    cog['toonId'] = None
 
 server = ToontownServer()
 server.run()

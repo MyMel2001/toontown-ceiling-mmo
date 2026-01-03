@@ -83,30 +83,48 @@ class Cog:
                     head_model.reparentTo(self.node.find('**/+Character').getChild(0))
                 
                 # Filter Cog head pieces
-                for part in head_model.findAllMatches('**'):
-                    part.hide()
+                # Hide all children and their sub-nodes first
+                for child in head_model.getChildren():
+                    child.hide()
+                    for sub in child.findAllMatches("**"):
+                        sub.hide()
                 
-                cog_head_name = name.lower().replace(" ", "").replace("&", "")
-                head_part = head_model.find(f"**/{cog_head_name}*")
+                cog_head_name = name.lower().replace(" ", "").replace("&", "").replace("-", "").replace(".", "")
+                
+                # Try to find a node that contains the cog name
+                head_part = head_model.find(f"**/*{cog_head_name}*")
                 
                 if head_part.isEmpty():
-                    # Fallback names
-                    if "flunky" in cog_head_name: head_part = head_model.find("**/flunky")
-                    elif "pencilpusher" in cog_head_name: head_part = head_model.find("**/pencilpusher")
-                    elif "yesman" in cog_head_name: head_part = head_model.find("**/yesman")
-                    elif "mover" in cog_head_name: head_part = head_model.find("**/movershaker")
-                    elif "bigcheese" in cog_head_name: head_part = head_model.find("**/thebigcheese")
+                    # Specific fallbacks for known Cog heads in these models
+                    if "flunky" in cog_head_name: head_part = head_model.find("**/flunky*")
+                    elif "pencil" in cog_head_name: head_part = head_model.find("**/pencilpusher*")
+                    elif "yesman" in cog_head_name: head_part = head_model.find("**/yesman*")
+                    elif "mover" in cog_head_name: head_part = head_model.find("**/movershaker*")
+                    elif "cheese" in cog_head_name: head_part = head_model.find("**/thebigcheese*")
+                    elif "telemarketer" in cog_head_name: head_part = head_model.find("**/telemarketer*")
+                    elif "tightwad" in cog_head_name: head_part = head_model.find("**/tightwad*")
+                    elif "bean" in cog_head_name: head_part = head_model.find("**/beancounter*")
+                    elif "number" in cog_head_name: head_part = head_model.find("**/numbercruncher*")
+                    elif "money" in cog_head_name: head_part = head_model.find("**/moneybags*")
+                    elif "twoface" in cog_head_name: head_part = head_model.find("**/twoface*")
                 
                 if not head_part.isEmpty():
+                    # Show the found part AND all its children recursively
                     head_part.show()
-                    # Also show all parents up to the head_model root
-                    p = head_part.getParent()
-                    while p and p != head_model:
-                        p.show()
-                        p = p.getParent()
+                    for sub in head_part.findAllMatches("**"):
+                        sub.show()
+                    
+                    # Ensure all ancestors up to the model root are shown
+                    curr = head_part
+                    while not curr.isEmpty() and curr != head_model:
+                        curr.show()
+                        curr = curr.getParent()
                 elif head_model.getNumChildren() > 0:
-                    head_model.getChild(0).show()
-                    head_model.getChild(0).showThrough()
+                    # If we couldn't find a match, show the first child as a fallback
+                    fallback = head_model.getChild(0)
+                    fallback.show()
+                    for sub in fallback.findAllMatches("**"):
+                        sub.show()
             except Exception as e:
                 print(f"Failed to load Cog head: {head_path}: {e}")
             

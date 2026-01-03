@@ -28,24 +28,56 @@ class Battle(FSM):
         self.gags = [
             ("Cream Pie Slice", "throw", "phase_5/models/props/cream-pie-slice.bam"),
             ("Fruit Pie Slice", "throw", "phase_5/models/props/fruit-pie-slice.bam"),
+            ("SUPER Cream Pie Slice", "throw", "phase_5/models/props/cream-pie-slice.bam"),
             ("Squirting Flower", "squirt", "phase_3.5/models/props/squirting-flower.bam"),
-            ("Glass of Water", "squirt", "phase_5/models/props/glass-mod.bam")
-        ]
-        
+            ("Glass of Water", "squirt", "phase_5/models/props/glass-mod.bam")        
+            ]
         self.gagDamage = {
             "Cream Pie Slice": 5,
             "Fruit Pie Slice": 10,
+            "SUPER Cream Pie Slice": 69,
             "Squirting Flower": 3,
             "Glass of Water": 6
         }
 
         self.gagButtons = []
+        numGags = len(self.gags)
+        cols = 2 if numGags <= 10 else 3
+        
         for i, (name, track, model) in enumerate(self.gags):
-            btn = DirectButton(text=name, scale=0.07, pos=(-0.4 if i < 2 else 0.4, 0, 0.2 - (i%2)*0.2),
+            row = i // cols
+            col = i % cols
+            
+            # Calculate grid layout
+            x_range = 1.0
+            x_start = -x_range / 2
+            x_offset = x_range / (cols - 1) if cols > 1 else 0
+            
+            # Center if the last row is incomplete
+            items_in_last_row = numGags % cols
+            is_last_row = row == (numGags - 1) // cols
+            if is_last_row and items_in_last_row > 0 and items_in_last_row < cols:
+                last_row_x_start = -(x_offset * (items_in_last_row - 1)) / 2
+                x_pos = last_row_x_start + col * x_offset
+            else:
+                x_pos = x_start + col * x_offset
+                
+            z_start = 0.2
+            z_offset = 0.13
+            z_pos = z_start - row * z_offset
+            
+            # Auto-sizing: slightly scale down for long names or many gags
+            btn_scale = 0.045
+            if len(name) > 15:
+                btn_scale = 0.035
+            if numGags > 12:
+                btn_scale *= 0.8
+
+            btn = DirectButton(text=name, scale=btn_scale, pos=(x_pos, 0, z_pos),
                                command=self.doAttack, extraArgs=[name, track, model], parent=self.battleFrame)
             self.gagButtons.append(btn)
 
-        self.runBtn = DirectButton(text="Run", scale=0.08, pos=(0, 0, -0.4),
+        self.runBtn = DirectButton(text="Run", scale=0.1, pos=(0, 0, -0.4),
                                    command=self.request, extraArgs=["Run"], parent=self.battleFrame)
         
         # Battle positioning
@@ -55,6 +87,8 @@ class Battle(FSM):
         self.toon.lookAt(self.cog.node)
 
     def doAttack(self, gagName, track, modelPath):
+        if hasattr(base, "localAvatar") and base.localAvatar.hp <= 0:
+            return
         self.battleFrame.hide()
         damage = self.gagDamage.get(gagName, 5)
         print(f"Toon uses {gagName}! Deals {damage} damage.")
@@ -91,14 +125,14 @@ class Battle(FSM):
             Sequence(
                 Wait(1.0),
                 Func(self.cleanup),
-                Func(self.cog.cleanup)
+                Func(self.cog.cleanup),
+                Func(self.request, "Off")
             ).start()
         elif hasattr(base, "localAvatar") and base.localAvatar.hp <= 0:
             print("Toon defeated!")
             self.cleanup()
-            # Logic for toon "dying" and going back to playground
-            if hasattr(base, "loadZone") and hasattr(base, "getPlaygroundForZone"):
-                base.loadZone(base.getPlaygroundForZone(getattr(base, "zID", 1)))
+            self.request("Off")
+            # LaffMeter handles teleportation via updateLaff()
         else:
             self.cogTurn()
 
@@ -125,28 +159,43 @@ class Battle(FSM):
         ).start()
 
     def checkBattleEndAfterCog(self):
+        if self.state == "Off": return
         if hasattr(base, "localAvatar") and base.localAvatar.hp <= 0:
             self.checkBattleEnd()
-        else:
+        elif self.cog and not self.cog.node.isEmpty():
             self.battleFrame.show()
+        else:
+            self.cleanup()
+            self.request("Off")
         
     def enterRun(self):
-        self.cleanup()
-        
+        print("Running away from battle...")
+        if hasattr(base, "loadZone") and hasattr(base, "getPlaygroundForZone") and hasattr(base, "zID"):
+            # Teleport back to the playground of the current neighborhood
+            playground = base.getPlaygroundForZone(base.zID)
+            print(f"Teleporting to playground: {playground}")
+            base.loadZone(playground)
+        else:
+            self.cleanup()
+        self.demand("Off")
+
     def cleanup(self):
+        if not hasattr(self, "battleFrame") or self.battleFrame is None:
+            return
+            
         self.battleFrame.destroy()
-        if not self.cog.node.isEmpty():
+        self.battleFrame = None
+        
+        if self.cog and not self.cog.node.isEmpty():
             self.cog.node.setPos(self.cog_orig_pos)
             self.cog.node.loop("Neutral")
-        self.cog.inBattle = False
+            self.cog.inBattle = False
         
         if hasattr(base, "localAvatar") and hasattr(base.localAvatar, "physControls"):
             base.localAvatar.physControls.enableAvatarControls()
 
         if hasattr(base, "battleMgr"):
             base.battleMgr.stopBattle()
-        
-        self.request("Off")
 
 class BattleManager:
     def __init__(self):
