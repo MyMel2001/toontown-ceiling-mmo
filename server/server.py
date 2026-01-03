@@ -68,6 +68,11 @@ class ToontownServer(ShowBase):
         return Task.cont
 
     def spawnCogsForZone(self, zoneId):
+        # Only spawn cogs in streets and Cog HQs
+        # Playgrounds: 0-4, 9-10; Misc: 6-7
+        if zoneId in [0, 1, 2, 3, 4, 6, 7, 9, 10]:
+            return
+
         if zoneId not in self.cogs:
             self.cogs[zoneId] = {}
             # Spawn 5-8 cogs per zone
