@@ -97,8 +97,8 @@ class Battle(FSM):
             print("Toon defeated!")
             self.cleanup()
             # Logic for toon "dying" and going back to playground
-            if hasattr(base, "loadZone"):
-                base.loadZone(1)
+            if hasattr(base, "loadZone") and hasattr(base, "getPlaygroundForZone"):
+                base.loadZone(base.getPlaygroundForZone(getattr(base, "zID", 1)))
         else:
             self.cogTurn()
 

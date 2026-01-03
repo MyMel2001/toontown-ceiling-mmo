@@ -17,6 +17,7 @@ import asyncio
 from networking import Networking
 from pick_a_toon_menu import PickAToonMenu
 from DNALoader import DNALoader
+import os
 
 base = ShowBase()
 base.disableMouse()
@@ -66,6 +67,25 @@ def getZoneName(zoneId):
     if zoneId < len(zones):
         return zones[zoneId]
     return f"Zone {zoneId}"
+
+def getPlaygroundForZone(zoneId):
+    # Mapping streets and special zones to their respective playgrounds
+    street_to_playground = {
+        11: 1, 12: 1, 13: 1, # TTC Streets
+        14: 2, 18: 2, 19: 2, 20: 2, # DD Streets
+        15: 0, 16: 0, 17: 0, # MM Streets
+        21: 3, 22: 3, # DG Streets
+        23: 9, 24: 9, 25: 9, # BR Streets
+        26: 10, 27: 10, # DL Streets
+        5: 3, # Sellbot HQ -> DG
+        8: 10, # Cashbot HQ -> DL
+    }
+    # If it's already a playground (0-4, 9, 10), return it.
+    if zoneId in [0, 1, 2, 3, 4, 9, 10]:
+        return zoneId
+    return street_to_playground.get(zoneId, 1)
+
+base.getPlaygroundForZone = getPlaygroundForZone
 
 global duckBody, localAvatar, zID, battleMgr, pickedToonArray
 duckBody = None
@@ -144,6 +164,7 @@ def loadZone(zoneId):
     
     old_zID = zID
     zID = zoneId
+    base.zID = zID
     G["pZID"] = old_zID
     
     try:
@@ -157,7 +178,8 @@ def spawnOneIceCream(task=None):
     if not hasattr(base, "iceCreams"):
         base.iceCreams = []
         
-    if zID == 1 and len(base.iceCreams) < 10:
+    playground_zones = [0, 1, 2, 3, 4, 9, 10]
+    if zID in playground_zones and len(base.iceCreams) < 10:
         x = random.uniform(-100, 100)
         y = random.uniform(-100, 100)
         ic = loader.loadModel("phase_4/models/props/icecream.bam")
@@ -172,8 +194,9 @@ def spawnIceCreams():
     if not hasattr(base, "iceCreams"):
         base.iceCreams = []
     
-    # Randomly spawn ice cream cones in playgrounds (for now zone 1)
-    if zID == 1:
+    # Randomly spawn ice cream cones in playgrounds
+    playground_zones = [0, 1, 2, 3, 4, 9, 10]
+    if zID in playground_zones:
         for i in range(10):
             spawnOneIceCream()
 
@@ -221,7 +244,8 @@ class LaffMeter(DirectFrame):
         self.teeth = self.container.find("**/teeth")
         
         self.hpLabel = DirectLabel(parent=self, text="", scale=0.4, pos=(0, 0, -0.1), 
-                                   text_fg=(0,0,0,1), frameColor=(0,0,0,0))
+                                   text_fg=(0,1,0,1), frameColor=(0,0,0,0))
+        self.isSad = False
         self.updateLaff()
 
     def updateLaff(self):
@@ -230,6 +254,15 @@ class LaffMeter(DirectFrame):
         maxHp = localAvatar.maxHp
         self.hpLabel['text'] = str(int(hp))
         
+        if hp <= 0:
+            self.hpLabel['text_fg'] = (1, 0, 0, 1) # Red
+            if not self.isSad:
+                self.isSad = True
+                base.loadZone(getPlaygroundForZone(zID))
+        else:
+            self.hpLabel['text_fg'] = (0, 1, 0, 1) # Green
+            self.isSad = False
+
         ratio = float(hp) / maxHp if maxHp > 0 else 0
         self.eyes.show()
         self.smile.hide()
@@ -384,8 +417,8 @@ def start_game(toon_index):
     localAvatar = duckBody
     base.localAvatar = localAvatar
     
-    localAvatar.maxHp = 15
-    localAvatar.hp = 15
+    localAvatar.maxHp = 64
+    localAvatar.hp = 64
     
     base.laffMeter = LaffMeter(toonDnaArray[toon_index])
     
@@ -451,7 +484,7 @@ def battleTriggerTask(task):
     return Task.cont
 
 def updateOnScreenDebug(task):
-    if localAvatar:
+    if localAvatar and os.getenv("DEBUG") == "True":
         onScreenDebug.add('Avatar Position', localAvatar.getPos())
         onScreenDebug.add('Avatar Angle', localAvatar.getHpr())
         onScreenDebug.add('Zone', zones[zID])
