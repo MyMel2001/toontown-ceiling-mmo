@@ -1,6 +1,7 @@
 from direct.actor.Actor import Actor
 from panda3d.core import *
 from direct.task import Task
+from direct.gui.DirectGui import *
 import random
 from thirdparty.nametag.toonNametag import createNametag
 
@@ -17,8 +18,11 @@ suitAnims = {
 # Note: For simplicity using A anims for all for now, or I'd need to map them all.
 
 class Cog:
-    def __init__(self, type='A', head=None, name="Cog"):
+    def __init__(self, type='A', head=None, name="Cog", level=1):
         self.type = type
+        self.level = level
+        self.maxHp = (level + 1) * (level + 2)
+        self.hp = self.maxHp
         
         # Determine correct animation paths based on type
         # Suit A and B are usually in phase_4, C is in phase_3.5
@@ -95,7 +99,31 @@ class Cog:
         self.node.reparentTo(render)
         self.node.loop('neutral')
         self.name = name
+        self.inBattle = False
         
+        # Create HP Meter
+        self.hpMeter = DirectWaitBar(text="", value=100, range=100, scale=0.5, pos=(0, 0, 0.8), 
+                                     barColor=(0, 1, 0, 1), frameColor=(0, 0, 0, 0.5),
+                                     relief=DGG.FLAT)
+        self.hpMeter.reparentTo(self.nametag)
+        self.updateHpMeter()
+        
+    def takeDamage(self, amount):
+        self.hp -= amount
+        if self.hp < 0: self.hp = 0
+        self.updateHpMeter()
+        return self.hp <= 0
+
+    def updateHpMeter(self):
+        if hasattr(self, 'hpMeter'):
+            self.hpMeter['value'] = (float(self.hp) / self.maxHp) * 100
+            if self.hpMeter['value'] > 50:
+                self.hpMeter['barColor'] = (0, 1, 0, 1)
+            elif self.hpMeter['value'] > 20:
+                self.hpMeter['barColor'] = (1, 1, 0, 1)
+            else:
+                self.hpMeter['barColor'] = (1, 0, 0, 1)
+
     def setPos(self, x, y, z):
         self.node.setPos(x, y, z)
         
@@ -113,8 +141,8 @@ class CogManager:
         base.taskMgr.remove("CogManagerUpdate")
         base.taskMgr.add(self.update, "CogManagerUpdate")
         
-    def spawnCog(self, type='A', head=None, pos=(0,0,0), name="Cog"):
-        cog = Cog(type, head, name=name)
+    def spawnCog(self, type='A', head=None, pos=(0,0,0), name="Cog", level=1):
+        cog = Cog(type, head, name=name, level=level)
         cog.setPos(*pos)
         cog.orig_pos = Point3(*pos)
         cog.target_pos = cog.orig_pos + Point3(random.uniform(-1255, 1255), random.uniform(-1255, 1255), 0)
@@ -123,7 +151,15 @@ class CogManager:
 
     def update(self, task):
         dt = globalClock.getDt()
+        
+        # Filter out cogs that have been cleaned up
+        self.cogs = [cog for cog in self.cogs if not cog.node.isEmpty()]
+        
         for cog in self.cogs:
+            # Skip cogs that are in a battle
+            if hasattr(cog, 'inBattle') and cog.inBattle:
+                continue
+                
             dist = (cog.node.getPos() - cog.target_pos).length()
             if dist > 1:
                 cog.node.lookAt(cog.target_pos)

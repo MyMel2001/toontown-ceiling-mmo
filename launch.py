@@ -1,3 +1,4 @@
+import random
 from sys import argv
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
@@ -10,6 +11,7 @@ from direct.controls.GravityWalker import GravityWalker
 import threading
 from thirdparty.nametag.toonNametag import createNametag
 from pickAToon import defineToon, destroyNPCS, get_builtins, toonDnaArray, toonNameArray, pickAToon
+from thirdparty.createToon.src.toon.ToonDNA import colorsList
 import datetime
 import asyncio
 from networking import Networking
@@ -65,7 +67,7 @@ def getZoneName(zoneId):
         return zones[zoneId]
     return f"Zone {zoneId}"
 
-global duckBody, localAvatar, zID, battleMgr
+global duckBody, localAvatar, zID, battleMgr, pickedToonArray
 duckBody = None
 localAvatar = None
 zID = 1
@@ -111,6 +113,12 @@ def loadZone(zoneId):
     global breakAllChecks, zID
     breakAllChecks = True
     
+    # Clear ice creams
+    if hasattr(base, "iceCreams"):
+        for ic in base.iceCreams:
+            ic.removeNode()
+    base.iceCreams = []
+    
     # Clear loading queue
     loading_queue.clear()
     
@@ -142,9 +150,91 @@ def loadZone(zoneId):
     
     try:
         execfile(f"{zID}.py")
+        spawnIceCreams()
     except Exception as e:
         print(f"Error loading zone {zID}: {e}")
 G["loadZone"] = loadZone
+
+def spawnIceCreams():
+    if not hasattr(base, "iceCreams"):
+        base.iceCreams = []
+    
+    # Randomly spawn ice cream cones in playgrounds (for now zone 1)
+    if zID == 1:
+        for i in range(10):
+            x = random.uniform(-100, 100)
+            y = random.uniform(-100, 100)
+            ic = loader.loadModel("phase_4/models/props/icecream.bam")
+            ic.reparentTo(render)
+            ic.setPos(x, y, 0.5)
+            ic.setScale(1.5)
+            base.iceCreams.append(ic)
+
+def iceCreamTask(task):
+    if localAvatar:
+        for ic in list(base.iceCreams):
+            if (localAvatar.getPos() - ic.getPos()).length() < 5.0:
+                print("Picked up Ice Cream!")
+                ic.removeNode()
+                base.iceCreams.remove(ic)
+                localAvatar.hp = min(localAvatar.maxHp, localAvatar.hp + 10)
+                if hasattr(base, "laffMeter"):
+                    base.laffMeter.updateLaff()
+    return Task.cont
+
+class LaffMeter(DirectFrame):
+    def __init__(self, dna):
+        DirectFrame.__init__(self, relief=None, scale=0.15, pos=(-1.1, 0, -0.8))
+        self.dna = dna
+        self.container = loader.loadModel("phase_3/models/gui/laff_o_meter.bam")
+        self.container.reparentTo(self)
+        
+        # Hide all heads
+        for head in self.container.find("**/heads").getChildren():
+            head.hide()
+            
+        species = dna[0]
+        mapping = {
+            'b': 'bearhead', 'ca': 'cathead', 'd': 'doghead', 'du': 'duckhead',
+            'h': 'horsehead', 'mo': 'monkeyhead', 'mi': 'mousehead', 'p': 'pighead',
+            'r': 'bunnyhead', 'ri': 'bunnyhead', 'cr': 'bearhead', 'de': 'bearhead'
+        }
+        headName = mapping.get(species, 'doghead')
+        self.head = self.container.find(f"**/heads/{headName}")
+        if not self.head.isEmpty():
+            self.head.show()
+            self.head.setColor(colorsList.get(dna[5], (1,1,1,1)))
+            
+        self.eyes = self.container.find("**/eyes")
+        self.smile = self.container.find("**/smile")
+        self.open_smile = self.container.find("**/open_smile")
+        self.frown = self.container.find("**/frown")
+        self.teeth = self.container.find("**/teeth")
+        
+        self.hpLabel = DirectLabel(parent=self, text="", scale=0.4, pos=(0, 0, -0.1), 
+                                   text_fg=(0,0,0,1), frameColor=(0,0,0,0))
+        self.updateLaff()
+
+    def updateLaff(self):
+        if not localAvatar: return
+        hp = localAvatar.hp
+        maxHp = localAvatar.maxHp
+        self.hpLabel['text'] = str(int(hp))
+        
+        ratio = float(hp) / maxHp if maxHp > 0 else 0
+        self.eyes.show()
+        self.smile.hide()
+        self.open_smile.hide()
+        self.frown.hide()
+        self.teeth.hide()
+        
+        if ratio > 0.7:
+            self.open_smile.show()
+            self.teeth.show()
+        elif ratio > 0.3:
+            self.smile.show()
+        else:
+            self.frown.show()
 
 class LoadingZone:
     @staticmethod
@@ -278,10 +368,16 @@ def handleMovement(task):
 def start_game(toon_index):
     global duckBody, localAvatar, walkControls
     base.taskMgr.add(battleTriggerTask, "BattleTriggerTask")
+    base.taskMgr.add(iceCreamTask, "IceCreamTask")
     toon = pickAToon(toon_index)
     duckBody = toon.toonActor
     localAvatar = duckBody
     base.localAvatar = localAvatar
+    
+    localAvatar.maxHp = 15
+    localAvatar.hp = 15
+    
+    base.laffMeter = LaffMeter(toonDnaArray[toon_index])
     
     head_joint = duckBody.find('**/def_head')
     if head_joint.isEmpty():
