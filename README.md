@@ -14,10 +14,10 @@ Like Toontown House, but more nerdy and open... 😃
 
 ## Known Issues.
 
-* Player models don't unload from the zone when the player quits the game or when "Back to TTC" pressed
-* No streets, therefore no cogs.
-* No text feild for chat
-* Fonts in Playground/Street/CogHQ DNA are set to default instead of the corresponding fonts.
+* ***Networking:*** Player models don't unload from the zone when the player quits the game or when "Back to TTC" pressed
+* ***Unknown:*** No streets, therefore no cogs.
+* ***Client:*** No text feild for chat
+* ***DNA Loader*** Fonts in Playground/Street/CogHQ DNA are set to default instead of the corresponding fonts.
 
 ## License
 MIT (Modified)
