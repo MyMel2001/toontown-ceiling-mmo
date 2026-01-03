@@ -3,10 +3,9 @@ Like Toontown House, but more nerdy and open... 😃
 
 ## Credits:
 
-~~* UnicorNora - making dna lib~~ (Now using custom DNA libraries)
-* SomethingRandom0768/TTR - making create a toon (thirdparty/)
+* SomethingRandom0768/TTR - making create a toon (thirdparty/) (used as library)
 * TTR/Stride - phase files (phase_\*/)
-* BoggoTV - creating the Toontown-Nametag lib (thirdparty/)
+* BoggoTV - creating the Toontown-Nametag library (thirdparty/)
 * Unknown person - creating landwalker code
 * Panda3D - The game engine (thirdparty/)
 * AI - helping with main code.
@@ -14,10 +13,7 @@ Like Toontown House, but more nerdy and open... 😃
 
 ## Known Issues.
 
-* ***Networking:*** Player models don't unload from the zone when the player quits the game or when "Back to TTC" pressed
-* ***Unknown:*** No streets, therefore no cogs.
-* ***Client:*** No text feild for chat
-* ***DNA Loader*** Fonts in Playground/Street/CogHQ DNA are set to default instead of the corresponding fonts.
+* ***DNA Loader*** Fonts in Playground/Street/CogHQ DNA are set to Mickey font instead of the corresponding fonts.
 
 ## License
 MIT (Modified)
