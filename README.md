@@ -1,5 +1,5 @@
 # Toontown Ceiling MMO
-Like Toontown House, but more nerdy and open... 😃
+A Toontown Private Server made of mostly freely available components. Code is mostly FOSS. 😃
 
 ## Credits:
 
