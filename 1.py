@@ -7,12 +7,12 @@ currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 base.localAvatar.setPos(0,0,0)
 
 LoadingZone = G["LoadingZone"]
-# Silly Street (To Melodyland)
+# Silly Street (To Garden)
 LoadingZone.define(-146.117, -4.0677, -153.27, 12.1799, 11)
-# Loopy Lane (To Docks)
-LoadingZone.define(-38.3287, 91.7318, -53.18, 101.799, 12)
-# Punchline Place (To Garden)
-LoadingZone.define(34.5333, -163.679, 24.6789, -148.533, 13)
+# Loopy Lane (To Melodyland)
+LoadingZone.define(-38.3287, 91.7318, -53.18, 101.799, 13)
+# Punchline Place (To Docks)
+LoadingZone.define(34.5333, -163.679, 24.6789, -148.533, 12)
 
 # Toontown Central Playground Extras
 # Goofy Speedway

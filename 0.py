@@ -9,14 +9,14 @@ base.localAvatar.setPos(0,0,0)
 LoadingZone = G["LoadingZone"]
 # Tunnel back to TTC
 # Tunnel back to TTC now goes through Silly Street (11)
-LoadingZone.define(12, 107, -8, 112, 11)
+LoadingZone.define(27, 81, 13, 67, 11)
 
 # Tenor Terrace (4100)
-LoadingZone.define(-38.3287, 91.7318, -53.18, 101.799, 15)
+LoadingZone.define(-18, -203, -32, -217, 15)
 # Alto Avenue (4200)
-LoadingZone.define(34.5333, -163.679, 24.6789, -148.533, 16)
+LoadingZone.define(87, 177, 73, 163, 16)
 # Baritone Boulevard (4300)
-LoadingZone.define(-127.328, -80.7726, -140.133, -56.2604, 17)
+LoadingZone.define(-163, 52, -177, 38, 17)
 
 global isCurrentZone
 isCurrentZone = True

@@ -117,7 +117,7 @@ class CogManager:
         cog = Cog(type, head, name=name)
         cog.setPos(*pos)
         cog.orig_pos = Point3(*pos)
-        cog.target_pos = cog.orig_pos + Point3(random.uniform(-20, 20), random.uniform(-20, 20), 0)
+        cog.target_pos = cog.orig_pos + Point3(random.uniform(-1255, 1255), random.uniform(-1255, 1255), 0)
         self.cogs.append(cog)
         return cog
 

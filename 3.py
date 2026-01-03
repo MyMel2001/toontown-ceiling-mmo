@@ -10,12 +10,12 @@ base.localAvatar.setPos(22.9513,60.1588,0.025)
 
 LoadingZone = G["LoadingZone"]
 # To Punchline Place/TTC (through Elm Street 14)
-LoadingZone.define(192, 187, 182, 197, 14)
+LoadingZone.define(194, 199, 180, 185, 14)
 
 # Labyrinth Lane (5200)
-LoadingZone.define(34.5333, -163.679, 24.6789, -148.533, 21)
+LoadingZone.define(-102, 300, -116, 286, 21)
 # Maple Street (5300)
-LoadingZone.define(-38.3287, 91.7318, -53.18, 101.799, 22)
+LoadingZone.define(-53, -88, -67, -102, 22)
 # To Sellbot HQ
 LoadingZone.define(3.6083, -1.4502, -14.5347, 9.84779, 5)
 

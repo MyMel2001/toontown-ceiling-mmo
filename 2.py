@@ -7,14 +7,19 @@ base.localAvatar.setPos(0,0,0)
 
 LoadingZone = G["LoadingZone"]
 # Tunnel back to TTC now through Loopy Lane (12)
-LoadingZone.define(-188, -118, -208, -98, 12)
+LoadingZone.define(-191, -102, -205, -116, 12)
 
 # Seaweed Street (1100)
-LoadingZone.define(-38.3287, 91.7318, -53.18, 101.799, 18)
+# (In Donald's Dock, Seaweed Street is the one connecting to TTC, 
+# but zone 18 is listed as Seaweed Street. 
+# We'll use linktunnel_dd_1225 for Seaweed Street 18 if Loopy Lane 12 is at 1101)
+LoadingZone.define(-208, 82, -222, 68, 18)
 # Barnacle Boulevard (1200)
-LoadingZone.define(34.5333, -163.679, 24.6789, -148.533, 19)
-# Lighthouse Lane (1300)
-LoadingZone.define(-127.328, -80.7726, -140.133, -56.2604, 20)
+# (Wait, if Seaweed is 18, Barnacle is 19. Using 1225 was Barnacle in my previous note.
+# Let's use 1301 for Lighthouse Lane 20)
+LoadingZone.define(172, -44, 158, -58, 20)
+# Outdoor Zone (6000)
+LoadingZone.define(-46, 179, -60, 165, 6)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/DOCKS.ogg')
