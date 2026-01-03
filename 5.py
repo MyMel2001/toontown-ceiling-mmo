@@ -23,6 +23,8 @@ G["music"] = loader.loadSfx('phase_9/audio/bgm/PLEASEDONTMAKEMEGOSADAGAIN.ogg')
 G["music"].setLoop(True)
 G["music"].play()
 
+# Cogs removed from Sellbot HQ area (treated as playground here)
+
 wall = loader.loadModel("phase_11/models/lawbotHQ/LB_wall_panel.bam")
 wall.reparentTo(currentLand.currentLandModels[zones[zID]])
 wall.setPos(76.670,-126.234,110.096)

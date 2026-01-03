@@ -20,9 +20,10 @@ G["music"] = loader.loadSfx('phase_4/audio/bgm/TC_nbrhood.ogg')
 G["music"].setLoop(True)
 G["music"].play()
 
-# Load all streets for TTC
-loadStreet('phase_5/dna/toontown_central_2100.xml', pos=(0, 0, 0))
-loadStreet('phase_5/dna/toontown_central_2200.xml', pos=(0, 0, 0))
-loadStreet('phase_5/dna/toontown_central_2300.xml', pos=(0, 0, 0))
+# Streets are now loaded progressively when approaching tunnels
+# Silly Street
+LoadingZone.define(-150, -20, -170, 20, 11)
+
+# Cogs removed from playground
 
 # hello from code-server on iPad

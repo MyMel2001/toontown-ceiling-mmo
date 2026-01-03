@@ -20,3 +20,7 @@ G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GARDEN_nbrhood.ogg')
 G["music"].setLoop(True)
 G["music"].play()
+
+# Streets are loaded progressively
+
+# Cogs removed from playground

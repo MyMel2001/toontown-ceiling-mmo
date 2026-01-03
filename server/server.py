@@ -19,6 +19,8 @@ class ToontownServer(ShowBase):
         if self.tcpSocket:
             self.cListener.addConnection(self.tcpSocket)
             print(f"Server started on port {port}")
+            self.connIds = {} # mapping connection object to a small stable integer ID
+            self.nextId = 1
         else:
             print(f"Failed to open port {port}")
             sys.exit()
@@ -36,7 +38,9 @@ class ToontownServer(ShowBase):
                 newConnection = newConnection.p()
                 self.activeConnections.append(newConnection)
                 self.cReader.addConnection(newConnection)
-                print(f"New connection from {netAddress}")
+                self.connIds[newConnection] = self.nextId
+                self.nextId += 1
+                print(f"New connection from {netAddress} (ID: {self.connIds[newConnection]})")
         return Task.cont
 
     def readTask(self, task):
@@ -121,7 +125,7 @@ class ToontownServer(ShowBase):
     def sendSpawn(self, target_conn, player_conn, data):
         dg = NetDatagram()
         dg.addUint8(5) # SPAWN MSG
-        dg.addUint32(id(player_conn))
+        dg.addUint32(self.connIds.get(player_conn, 0))
         dg.addString(data['name'])
         dg.addUint8(len(data['dna']))
         for item in data['dna']:
@@ -149,7 +153,7 @@ class ToontownServer(ShowBase):
         data = self.clients[conn]
         dg = NetDatagram()
         dg.addUint8(2) # POS UPDATE
-        dg.addUint32(id(conn))
+        dg.addUint32(self.connIds.get(conn, 0))
         dg.addFloat32(data['pos'][0])
         dg.addFloat32(data['pos'][1])
         dg.addFloat32(data['pos'][2])
@@ -165,7 +169,7 @@ class ToontownServer(ShowBase):
     def broadcastDespawn(self, conn, zone):
         dg = NetDatagram()
         dg.addUint8(6) # DESPAWN
-        dg.addUint32(id(conn))
+        dg.addUint32(self.connIds.get(conn, 0))
         for other_conn in self.clients:
             if other_conn != conn and self.clients[other_conn]['zone'] == zone:
                 self.cWriter.send(dg, other_conn)
@@ -173,7 +177,7 @@ class ToontownServer(ShowBase):
     def broadcastChat(self, conn, text):
         dg = NetDatagram()
         dg.addUint8(4)
-        dg.addUint32(id(conn))
+        dg.addUint32(self.connIds.get(conn, 0))
         dg.addString(text)
         zone = self.clients[conn]['zone']
         for other_conn in self.clients:

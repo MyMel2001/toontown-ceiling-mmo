@@ -10,10 +10,9 @@ breakAllChecks = False
 G = get_builtins()
 LoadingZone = G["LoadingZone"]
 # Tunnel back to TTC
-LoadingZone.define(12, 107, -8, 112, 1)
+# Tunnel back to TTC now goes through Silly Street (11)
+LoadingZone.define(12, 107, -8, 112, 11)
 
-# note: normally one would use "awaitForZoneThread()" before each loading zone, but this isn't quite defined yet
-# until we actually make a loadingzone.
 global isCurrentZone
 isCurrentZone = True
 
@@ -21,3 +20,6 @@ G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/WW_nbrhood.ogg')
 G["music"].setLoop(True)
 G["music"].play()
+
+# Streets are loaded progressively from tunnels
+# Cogs removed from playground

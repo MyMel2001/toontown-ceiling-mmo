@@ -19,6 +19,13 @@ from DNALoader import DNALoader
 base = ShowBase()
 base.disableMouse()
 
+# Setup Cull Bins
+cbm = CullBinManager.getGlobalPtr()
+if cbm.findBin('shadow') == -1:
+    cbm.addBin('shadow', CullBinManager.BTFixed, 40)
+if cbm.findBin('ground') == -1:
+    cbm.addBin('ground', CullBinManager.BTFixed, 10)
+
 G = get_builtins()
 G["music"] = loader.loadSfx('phase_3/audio/bgm/c_theme.ogg')
 G["music"].setLoop(True)
@@ -70,8 +77,10 @@ global breakAllChecks
 breakAllChecks = False
 
 def loadZone(zoneId):
-    global breakAllChecks, zID
+    global breakAllChecks, zID, loading_queue
     breakAllChecks = True
+    loading_queue = [] # Clear queue on zone change
+    
     try:
         if zones[zID] in currentLand.currentLandModels:
             currentLand.currentLandModels[zones[zID]].removeNode()
@@ -88,11 +97,16 @@ def loadZone(zoneId):
             for cog in base.cogMgr.cogs:
                 cog.cleanup()
             base.cogMgr.cogs = []
+            
+        # Instead of executing directly, we'll let the script queue its loads
         execfile(f"{zID}.py")
+        
         if hasattr(base, "net"):
             base.net.changeZone(zID)
     except Exception as e:
         print(f"Error loading zone {zID}: {e}")
+
+G["loadZone"] = loadZone
 
 class LoadingZone:
     @staticmethod
@@ -112,17 +126,45 @@ class LoadingZone:
 
 G["LoadingZone"] = LoadingZone
 
-def loadStreet(path, pos=(0, 0, 0), hpr=(0, 0, 0)):
+loading_queue = []
+is_loading = False
+
+def process_loading_queue(task):
+    global is_loading
+    if not loading_queue:
+        is_loading = False
+        return Task.done
+    
+    is_loading = True
+    load_func, args = loading_queue.pop(0)
+    load_func(*args)
+    
+    # Schedule next load with a small delay for "progressive" feel
+    base.taskMgr.doMethodLater(0.5, process_loading_queue, "process_loading_queue")
+    return Task.done
+
+def queue_load(func, *args):
+    loading_queue.append((func, args))
+    if not is_loading:
+        base.taskMgr.add(process_loading_queue, "process_loading_queue")
+
+def actual_load_street(path, pos, hpr):
+    print(f"Progressive loading: {path}")
     if path.endswith('.xml'):
         street = dna_loader.loadDNA(path)
     else:
         street = loader.loadModel(path)
-    street.reparentTo(render)
-    street.setPos(pos)
-    street.setHpr(hpr)
-    return street
+    if street:
+        street.reparentTo(render)
+        street.setPos(pos)
+        street.setHpr(hpr)
+
+def loadStreet(path, pos=(0, 0, 0), hpr=(0, 0, 0)):
+    queue_load(actual_load_street, path, pos, hpr)
+    return None # Return None because it's async now
 
 G["loadStreet"] = loadStreet
+G["queue_load"] = queue_load
 
 def setWatchKey(key, input, keyMapName):
     def watchKey(active=True):

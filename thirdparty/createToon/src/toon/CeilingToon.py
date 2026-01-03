@@ -70,25 +70,33 @@ class Toon:
         '''Updates Toon's pieces, and then creates an actor.'''
 
         if self.toonActor:
-            self.toonActor = None
+            self.toonActor.cleanup()
+            self.toonActor.removeNode()
 
+        # Create body and legs as multipart actor
         self.toonActor = Actor(
-
             {
-                'head': self.returnHead(),
                 'torso': self.returnTorso(),
                 'legs': self.returnLegs()
             },
-
             {
-                'head': self.returnHeadAnim(self.headtype),
                 'torso': self.returnTorsoAnim(self.torso_type),
                 'legs':  self.returnLegsAnim(self.leg_size)
             })
 
-        self.toonActor.attach('head', 'torso', 'def_head')
         self.toonActor.attach('torso', 'legs', 'joint_hips')
-        self.toonActor.showPart('head')
+        
+        # Attach head manually to the head joint of the torso
+        head_joint = self.toonActor.find('**/def_head')
+        if head_joint.isEmpty():
+            head_joint = self.toonActor.find('**/joint_head')
+            
+        if not head_joint.isEmpty():
+            self.head.head_model.reparentTo(head_joint)
+        else:
+            print("Warning: Could not find head joint in torso model!")
+            self.head.head_model.reparentTo(self.toonActor)
+            self.head.head_model.setZ(3) # Fallback height
 
         self.toonActor.reparentTo(render)
         self.toonActor.setPos(2, 35, 0)
@@ -190,13 +198,13 @@ class Toon:
         self.head_color = color_to_set
         color = colorsList[self.head_color]
         
-        # Color all head pieces
-        for part in self.toonActor.findAllMatches('**/head*'):
+        # Color all head pieces in the head model
+        for part in self.head.head_model.findAllMatches('**/head*'):
             part.setColor(color)
         
         # Color all ear pieces (except for monkeys)
         if self.species != 'mo':
-            for part in self.toonActor.findAllMatches('**/ears*'):
+            for part in self.head.head_model.findAllMatches('**/ears*'):
                 part.setColor(color)
 
     def updateTorso(self, torso_type):

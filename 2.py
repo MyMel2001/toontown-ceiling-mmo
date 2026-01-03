@@ -15,6 +15,6 @@ G["music"] = loader.loadSfx('phase_6/audio/bgm/DOCKS.ogg')
 G["music"].setLoop(True)
 G["music"].play()
 
-from cog import CogManager
-base.cogMgr = CogManager()
-base.cogMgr.spawnCog('C', 'phase_3.5/models/char/suitC-heads.bam', (40, 0, 0), name="Tightwad")
+# Streets are loaded progressively from tunnels
+
+# Cogs removed from playground

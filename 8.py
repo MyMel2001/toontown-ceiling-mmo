@@ -15,3 +15,5 @@ G["music"].stop()
 G["music"] = loader.loadSfx('phase_9/audio/bgm/encntr_suit_winning_variation.ogg')
 G["music"].setLoop(True)
 G["music"].play()
+
+# Cogs removed from Cashbot HQ area

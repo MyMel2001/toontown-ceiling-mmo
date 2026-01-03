@@ -2,16 +2,17 @@ from direct.actor.Actor import Actor
 from panda3d.core import *
 from direct.task import Task
 import random
+from thirdparty.nametag.toonNametag import createNametag
 
 suitTypes = {
-    'A': 'phase_3.5/models/char/suitA-mod.bam',
-    'B': 'phase_3.5/models/char/suitB-mod.bam',
-    'C': 'phase_3.5/models/char/suitC-mod.bam'
+    'A': 'phase_4/models/char/suitA-mod.bam',
+    'B': 'phase_4/models/char/suitB-mod.bam',
+    'C': 'phase_4/models/char/suitC-mod.bam'
 }
 
 suitAnims = {
-    'neutral': 'phase_3.5/models/char/suitA-neutral.bam',
-    'walk': 'phase_3.5/models/char/suitA-walk.bam',
+    'neutral': 'phase_4/models/char/suitA-neutral.bam',
+    'walk': 'phase_4/models/char/suitA-walk.bam',
 }
 # Note: For simplicity using A anims for all for now, or I'd need to map them all.
 
@@ -23,32 +24,59 @@ class Cog:
             'walk': suitAnims['walk'].replace('A', type)
         })
         
+        # Add nametag
+        self.nametag = createNametag(name, bg=(0.2, 0.2, 0.2, 0.8), fg=(0.8, 0.8, 0.8, 1), fontPath='phase_3/fonts/vtRemingtonPortable.ttf')
+        self.nametag.setScale(0.8)
+        
+        # Find the head joint for nametag placement
+        head_joint = self.node.find('**/joint_head')
+        if head_joint.isEmpty():
+            head_joint = self.node.find('**/def_head')
+        
+        if not head_joint.isEmpty():
+            self.nametag.reparentTo(head_joint)
+            self.nametag.setPos(0, 0, 2)
+        else:
+            self.nametag.reparentTo(self.node)
+            self.nametag.setPos(0, 0, 8)
+        
         if head:
-            head_model = loader.loadModel(head)
-            # Find the head joint
-            head_joint = self.node.find('**/joint_head')
-            if head_joint.isEmpty():
-                head_joint = self.node.find('**/def_head')
-            head_model.reparentTo(head_joint)
+            # Fix: Ensure correct path for heads (many are in phase_4, some in phase_3.5)
+            head_path = head
+            if "phase_3.5" in head_path:
+                head_path = head_path.replace("phase_3.5", "phase_4")
             
-            # Filter Cog head pieces
-            # Many cog head models contain all heads for that suit type.
-            # We hide all and show only the one matching the cog name.
-            for part in head_model.getChildren():
-                part.hide()
-            
-            cog_head_name = name.lower().replace(" ", "")
-            head_part = head_model.find(f"**/{cog_head_name}*")
-            if head_part.isEmpty():
-                # Fallback names
-                if cog_head_name == "flunky": head_part = head_model.find("**/flunky")
-                elif cog_head_name == "yesman": head_part = head_model.find("**/yesman")
-                # Add more mappings as needed or just show the first one
-            
-            if not head_part.isEmpty():
-                head_part.show()
-            elif head_model.getNumChildren() > 0:
-                head_model.getChild(0).show()
+            try:
+                head_model = loader.loadModel(head_path)
+                # Find the head joint
+                head_joint = self.node.find('**/joint_head')
+                if head_joint.isEmpty():
+                    head_joint = self.node.find('**/def_head')
+                
+                if not head_joint.isEmpty():
+                    head_model.reparentTo(head_joint)
+                else:
+                    head_model.reparentTo(self.node.find('**/+Character').getChild(0))
+                
+                # Filter Cog head pieces
+                for part in head_model.getChildren():
+                    part.hide()
+                
+                cog_head_name = name.lower().replace(" ", "")
+                head_part = head_model.find(f"**/{cog_head_name}*")
+                
+                if head_part.isEmpty():
+                    # Fallback names
+                    if "flunky" in cog_head_name: head_part = head_model.find("**/flunky")
+                    elif "pencilpusher" in cog_head_name: head_part = head_model.find("**/pencilpusher")
+                    elif "yesman" in cog_head_name: head_part = head_model.find("**/yesman")
+                
+                if not head_part.isEmpty():
+                    head_part.show()
+                elif head_model.getNumChildren() > 0:
+                    head_model.getChild(0).show()
+            except Exception as e:
+                print(f"Failed to load Cog head: {head_path}: {e}")
             
         self.node.reparentTo(render)
         self.node.loop('neutral')
@@ -67,6 +95,8 @@ class Cog:
 class CogManager:
     def __init__(self):
         self.cogs = []
+        # Clear existing update task if it exists to avoid duplicates
+        base.taskMgr.remove("CogManagerUpdate")
         base.taskMgr.add(self.update, "CogManagerUpdate")
         
     def spawnCog(self, type='A', head=None, pos=(0,0,0), name="Cog"):

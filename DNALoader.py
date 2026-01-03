@@ -92,8 +92,8 @@ class DNALoader:
                 new_np = parent.attachNewNode(code)
                 model.copyTo(new_np)
                 self.parseNode(xml_node, new_np)
-            except:
-                print(f"Failed to load model {model_path} for code {code}")
+            except Exception as e:
+                print(f"Failed to load model {model_path} for code {code}: {e}")
         else:
             # Create a dummy node to hold transform
             dummy = parent.attachNewNode(xml_node.get('name', xml_node.get('code', 'prop')))
@@ -120,8 +120,8 @@ class DNALoader:
                 new_np = parent.attachNewNode(code)
                 model.copyTo(new_np)
                 self.parseNode(xml_node, new_np)
-            except:
-                print(f"Failed to load landmark model {model_path} for code {code}")
+            except Exception as e:
+                print(f"Failed to load landmark model {model_path} for code {code}: {e}")
         else:
             print(f"Warning: Landmark code {code} not found in storage.")
             dummy = parent.attachNewNode(xml_node.get('id', 'landmark'))
@@ -137,18 +137,29 @@ class DNALoader:
         code = xml_node.get('code')
         height = float(xml_node.get('height', 10))
         if code in self.storage:
-            model_path = self.storage[code]
+            entry = self.storage[code]
+            model_path = entry['path']
+            node_name = entry['node']
             if not model_path.endswith('.bam'):
                 model_path += '.bam'
             try:
-                model = loader.loadModel(model_path)
-                model.reparentTo(parent)
+                full_model = loader.loadModel(model_path)
+                if node_name:
+                    model = full_model.find("**/" + node_name)
+                else:
+                    model = full_model.find("**/" + code)
+                
+                if model.isEmpty():
+                    model = full_model
+                
+                new_np = parent.attachNewNode(code)
+                model.copyTo(new_np)
                 # Walls are often composed of several heights, 
                 # but Toontown DNA uses scaling to achieve height.
-                model.setSz(height / 10.0) # Assume base height is 10
-                self.parseNode(xml_node, model)
-            except:
-                pass
+                new_np.setSz(height / 10.0) # Assume base height is 10
+                self.parseNode(xml_node, new_np)
+            except Exception as e:
+                print(f"Failed to load wall model {model_path} for code {code}: {e}")
         else:
             dummy = parent.attachNewNode("wall")
             self.parseNode(xml_node, dummy)
@@ -160,14 +171,25 @@ class DNALoader:
         
         code = xml_node.get('code')
         if code and code in self.storage:
-            model_path = self.storage[code]
+            entry = self.storage[code]
+            model_path = entry['path']
+            node_name = entry['node']
             if not model_path.endswith('.bam'):
                 model_path += '.bam'
             try:
-                sign_model = loader.loadModel(model_path)
-                sign_model.reparentTo(sign_node)
-            except:
-                pass
+                full_model = loader.loadModel(model_path)
+                if node_name:
+                    model = full_model.find("**/" + node_name)
+                else:
+                    model = full_model.find("**/" + code)
+                
+                if model.isEmpty():
+                    model = full_model
+                
+                new_np = sign_node.attachNewNode(code)
+                model.copyTo(new_np)
+            except Exception as e:
+                print(f"Failed to load sign model {model_path} for code {code}: {e}")
         
         self.parseNode(xml_node, sign_node)
 

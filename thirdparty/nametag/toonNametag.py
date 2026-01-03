@@ -6,14 +6,14 @@ from panda3d.core import Loader
 from panda3d.core import NodePath
 from panda3d.core import DepthWriteAttrib
 
-def createNametag(name, bg=(1,1,1,.5), fg=(0,0,0,1), plateFile='panel.bam'):
+def createNametag(name, bg=(1,1,1,.5), fg=(0,0,0,1), plateFile='panel.bam', fontPath='phase_3/fonts/ImpressBT.ttf'):
     #settings
     nameBg = bg #nameplate, or panel, colour
     model = loader.loadModel(plateFile) #panel model
     nameFg = fg #text colour
     wordWrap = 7.5 #wordwrap, default for TTR/TTO is 7.5
     displayName = name #current displayed name
-    font = loader.loadFont('ImpressBT.ttf') #font to be used on nameplate, can be changed for cogs.
+    font = loader.loadFont(fontPath) #font to be used on nameplate, can be changed for cogs.
     font.setLineHeight(1) #line spacing, default for toontown is 1
     WIDTH_PADDING = 0.2 #horizontal padding of nametag
     HEIGHT_PADDING = 0.2 #vertical padding of nametag
