@@ -68,13 +68,13 @@ class ToontownServer(ShowBase):
         return Task.cont
 
     def spawnCogsForZone(self, zoneId):
-        # Only spawn cogs in streets and Cog HQs
-        # Playgrounds: 0-4, 9-10; Misc: 6-7
-        if zoneId in [0, 1, 2, 3, 4, 6, 7, 9, 10]:
-            return
-
         if zoneId not in self.cogs:
             self.cogs[zoneId] = {}
+            # Only spawn cogs in streets and Cog HQs
+            # Playgrounds: 0-4, 9-10; Misc: 6-7
+            if zoneId in [0, 1, 2, 3, 4, 6, 7, 9, 10]:
+                return
+
             # Spawn 5-8 cogs per zone
             numCogs = random.randint(5, 8)
             for _ in range(numCogs):
@@ -230,7 +230,7 @@ class ToontownServer(ShowBase):
                     self.sendSpawn(conn, other_conn, data)
             
             # Send current cogs to new player
-            for cogId in self.cogs[zone]:
+            for cogId in self.cogs.get(zone, {}):
                 self.broadcastCogSpawn(zone, cogId)
 
             # Broadcast new player to others
@@ -269,7 +269,7 @@ class ToontownServer(ShowBase):
                         self.sendSpawn(other_conn, conn, self.clients[conn])
                 
                 # Send current cogs to player
-                for cogId in self.cogs[new_zone]:
+                for cogId in self.cogs.get(new_zone, {}):
                     self.broadcastCogSpawn(new_zone, cogId)
 
         elif msgID == 4: # CHAT
