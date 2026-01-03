@@ -4,6 +4,8 @@ ConfigVariableString("window-type","none").setValue("none")
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 import sys
+import random
+import math
 
 class ToontownServer(ShowBase):
     def __init__(self):
@@ -15,6 +17,8 @@ class ToontownServer(ShowBase):
 
         self.activeConnections = []
         self.clients = {} # conn: {dna, pos, zone, name}
+        self.cogs = {} # zoneId: {cogId: data}
+        self.nextCogId = 1
 
         port = 1913
         self.tcpSocket = self.cManager.openTCPServerRendezvous(port, 5)
@@ -29,6 +33,117 @@ class ToontownServer(ShowBase):
 
         self.taskMgr.add(self.listenTask, "ListenTask")
         self.taskMgr.add(self.readTask, "ReadTask")
+        self.taskMgr.add(self.cogUpdateTask, "CogUpdateTask")
+
+    def cogUpdateTask(self, task):
+        dt = globalClock.getDt()
+        for zoneId, cogs in self.cogs.items():
+            # If no players in zone, maybe skip?
+            playersInZone = [c for c in self.clients if self.clients[c]['zone'] == zoneId]
+            if not playersInZone:
+                continue
+
+            for cogId, cog in cogs.items():
+                if cog.get('inBattle'): continue
+                
+                # Simple random walk
+                dist = (Vec3(cog['pos']) - Vec3(cog['target_pos'])).length()
+                if dist > 1:
+                    dir = Vec3(cog['target_pos']) - Vec3(cog['pos'])
+                    dir.normalize()
+                    newPos = Vec3(cog['pos']) + dir * 5 * dt
+                    cog['pos'] = (newPos.getX(), newPos.getY(), newPos.getZ())
+                    # Calculate H
+                    cog['h'] = math.atan2(-dir.getX(), dir.getY()) * 180 / math.pi
+                    
+                    # Broadcast update periodically or if moved enough
+                    # For now just broadcast every tick to keep it simple, but maybe too much traffic
+                else:
+                    cog['target_pos'] = (cog['orig_pos'][0] + random.uniform(-50, 50),
+                                        cog['orig_pos'][1] + random.uniform(-50, 50),
+                                        cog['orig_pos'][2])
+            
+            self.broadcastCogPos(zoneId)
+        
+        return Task.cont
+
+    def spawnCogsForZone(self, zoneId):
+        if zoneId not in self.cogs:
+            self.cogs[zoneId] = {}
+            # Spawn 5-8 cogs per zone
+            numCogs = random.randint(5, 8)
+            for _ in range(numCogs):
+                self.spawnCog(zoneId)
+
+    def spawnCog(self, zoneId):
+        cogId = self.nextCogId
+        self.nextCogId += 1
+        
+        cogData = random.choice([
+            ("Flunky", "C"), ("Pencil Pusher", "B"), ("Yesman", "A"), ("Micromanager", "C"),
+            ("Downsizer", "B"), ("Head Hunter", "A"), ("Corporate Raider", "C"), ("The Big Cheese", "A"),
+            ("Bottom Feeder", "C"), ("Bloodsucker", "B"), ("Double Talker", "A"), ("Ambulance Chaser", "C"),
+            ("Backstabber", "B"), ("Spin Doctor", "A"), ("Legal Eagle", "C"), ("Big Wig", "A"),
+            ("Short Change", "C"), ("Penny Pincher", "B"), ("Tightwad", "A"), ("Bean Counter", "C"),
+            ("Number Cruncher", "B"), ("Money Bags", "A"), ("Loan Shark", "C"), ("Robber Baron", "A"),
+            ("Cold Caller", "C"), ("Telemarketer", "B"), ("Name Dropper", "A"), ("Glad Hander", "C"),
+            ("Mover & Shaker", "B"), ("Two-Face", "A"), ("The Mingler", "C"), ("Mr. Hollywood", "A")
+        ])
+        
+        name, type = cogData
+        level = random.randint(1, 12)
+        pos = (random.uniform(-100, 100), random.uniform(-100, 100), 0)
+        
+        self.cogs[zoneId][cogId] = {
+            'name': name,
+            'type': type,
+            'level': level,
+            'pos': pos,
+            'orig_pos': pos,
+            'target_pos': pos,
+            'h': 0,
+            'hp': (level + 1) * (level + 2),
+            'maxHp': (level + 1) * (level + 2),
+            'inBattle': False
+        }
+        
+        # Broadcast to all players in zone
+        self.broadcastCogSpawn(zoneId, cogId)
+
+    def broadcastCogSpawn(self, zoneId, cogId):
+        cog = self.cogs[zoneId][cogId]
+        dg = NetDatagram()
+        dg.addUint8(7) # COG SPAWN
+        dg.addUint32(cogId)
+        dg.addString(cog['type'])
+        dg.addString(cog['name'])
+        dg.addUint8(cog['level'])
+        dg.addFloat32(cog['pos'][0])
+        dg.addFloat32(cog['pos'][1])
+        dg.addFloat32(cog['pos'][2])
+        dg.addFloat32(cog['h'])
+        
+        for conn, data in self.clients.items():
+            if data['zone'] == zoneId:
+                self.cWriter.send(dg, conn)
+
+    def broadcastCogPos(self, zoneId):
+        if zoneId not in self.cogs: return
+        
+        dg = NetDatagram()
+        dg.addUint8(8) # COG POS
+        dg.addUint16(len(self.cogs[zoneId]))
+        for cogId, cog in self.cogs[zoneId].items():
+            dg.addUint32(cogId)
+            dg.addFloat32(cog['pos'][0])
+            dg.addFloat32(cog['pos'][1])
+            dg.addFloat32(cog['pos'][2])
+            dg.addFloat32(cog['h'])
+            dg.addString("walk" if (Vec3(cog['pos']) - Vec3(cog['target_pos'])).length() > 1 else "neutral")
+
+        for conn, data in self.clients.items():
+            if data['zone'] == zoneId:
+                self.cWriter.send(dg, conn)
 
     def listenTask(self, task):
         if self.cListener.newConnectionAvailable():
@@ -101,11 +216,18 @@ class ToontownServer(ShowBase):
             }
             print(f"Player {name} logged in at zone {zone}")
             
+            # Spawn cogs for this zone if not already spawned
+            self.spawnCogsForZone(zone)
+
             # Send current players to new player
             for other_conn, data in self.clients.items():
                 if other_conn != conn and data['zone'] == zone:
                     self.sendSpawn(conn, other_conn, data)
             
+            # Send current cogs to new player
+            for cogId in self.cogs[zone]:
+                self.broadcastCogSpawn(zone, cogId)
+
             # Broadcast new player to others
             for other_conn in self.clients:
                 if other_conn != conn and self.clients[other_conn]['zone'] == zone:
@@ -132,16 +254,84 @@ class ToontownServer(ShowBase):
                 # Despawn from old zone
                 self.broadcastDespawn(conn, old_zone)
                 
+                # Spawn cogs for new zone if not already spawned
+                self.spawnCogsForZone(new_zone)
+
                 # Spawn in new zone
                 for other_conn, data in self.clients.items():
                     if other_conn != conn and data['zone'] == new_zone:
                         self.sendSpawn(conn, other_conn, data)
                         self.sendSpawn(other_conn, conn, self.clients[conn])
+                
+                # Send current cogs to player
+                for cogId in self.cogs[new_zone]:
+                    self.broadcastCogSpawn(new_zone, cogId)
 
         elif msgID == 4: # CHAT
             if conn in self.clients:
                 text = it.getString()
                 self.broadcastChat(conn, text)
+
+        elif msgID == 9: # BATTLE REQUEST
+            if conn in self.clients:
+                cogId = it.getUint32()
+                zoneId = self.clients[conn]['zone']
+                if zoneId in self.cogs and cogId in self.cogs[zoneId]:
+                    cog = self.cogs[zoneId][cogId]
+                    if not cog['inBattle']:
+                        cog['inBattle'] = True
+                        cog['toonId'] = self.connIds[conn]
+                        # Broadcast battle start
+                        self.broadcastBattleStart(zoneId, cogId, self.connIds[conn])
+
+        elif msgID == 10: # BATTLE ACTION
+            if conn in self.clients:
+                cogId = it.getUint32()
+                damage = it.getUint8()
+                zoneId = self.clients[conn]['zone']
+                if zoneId in self.cogs and cogId in self.cogs[zoneId]:
+                    cog = self.cogs[zoneId][cogId]
+                    cog['hp'] -= damage
+                    if cog['hp'] <= 0:
+                        cog['hp'] = 0
+                        # Cog defeated
+                        self.broadcastBattleUpdate(zoneId, cogId, damage, cog['hp'])
+                        # Remove cog after delay?
+                        self.taskMgr.doMethodLater(2.0, self.despawnCog, f"despawnCog-{cogId}", extraArgs=[zoneId, cogId])
+                    else:
+                        self.broadcastBattleUpdate(zoneId, cogId, damage, cog['hp'])
+
+    def broadcastBattleStart(self, zoneId, cogId, toonId):
+        dg = NetDatagram()
+        dg.addUint8(9)
+        dg.addUint32(cogId)
+        dg.addUint32(toonId)
+        for conn, data in self.clients.items():
+            if data['zone'] == zoneId:
+                self.cWriter.send(dg, conn)
+
+    def broadcastBattleUpdate(self, zoneId, cogId, damage, hp):
+        dg = NetDatagram()
+        dg.addUint8(12) # BATTLE UPDATE
+        dg.addUint32(cogId)
+        dg.addUint8(damage)
+        dg.addUint16(hp)
+        for conn, data in self.clients.items():
+            if data['zone'] == zoneId:
+                self.cWriter.send(dg, conn)
+
+    def despawnCog(self, zoneId, cogId):
+        if zoneId in self.cogs and cogId in self.cogs[zoneId]:
+            del self.cogs[zoneId][cogId]
+            dg = NetDatagram()
+            dg.addUint8(11) # COG DESPAWN
+            dg.addUint32(cogId)
+            for conn, data in self.clients.items():
+                if data['zone'] == zoneId:
+                    self.cWriter.send(dg, conn)
+            
+            # Spawn a new cog to replace it after a while
+            self.taskMgr.doMethodLater(10.0, lambda task: self.spawnCog(zoneId), f"respawnCog-{zoneId}")
 
     def sendSpawn(self, target_conn, player_conn, data):
         dg = NetDatagram()

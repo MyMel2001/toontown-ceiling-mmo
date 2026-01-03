@@ -18,9 +18,10 @@ suitAnims = {
 # Note: For simplicity using A anims for all for now, or I'd need to map them all.
 
 class Cog:
-    def __init__(self, type='A', head=None, name="Cog", level=1):
+    def __init__(self, type='A', head=None, name="Cog", level=1, cogId=0):
         self.type = type
         self.level = level
+        self.cogId = cogId
         self.maxHp = (level + 1) * (level + 2)
         self.hp = self.maxHp
         
@@ -39,7 +40,7 @@ class Cog:
         })
         
         # Add nametag
-        self.nametag = createNametag(name, bg=(0.2, 0.2, 0.2, 0.8), fg=(0.8, 0.8, 0.8, 1), fontPath='phase_3/fonts/vtRemingtonPortable.ttf')
+        self.nametag = createNametag(f"{name}\nLevel {level}", bg=(0.2, 0.2, 0.2, 0.8), fg=(0.8, 0.8, 0.8, 1), fontPath='phase_3/fonts/vtRemingtonPortable.ttf')
         self.nametag.setScale(0.8)
         
         # Find the head joint for nametag placement
@@ -54,6 +55,11 @@ class Cog:
             self.nametag.reparentTo(self.node)
             self.nametag.setPos(0, 0, 8)
         
+        if not head:
+            # Auto-determine head model if not provided
+            if type == 'C': head = 'phase_3.5/models/char/suitC-heads.bam'
+            else: head = f'phase_4/models/char/suit{type}-heads.bam'
+
         if head:
             # Fix: Ensure correct path for heads (many are in phase_4, some in phase_3.5)
             head_path = head
@@ -136,36 +142,33 @@ class Cog:
 
 class CogManager:
     def __init__(self):
-        self.cogs = []
-        # Clear existing update task if it exists to avoid duplicates
-        base.taskMgr.remove("CogManagerUpdate")
-        base.taskMgr.add(self.update, "CogManagerUpdate")
+        self.cogs = {} # cogId: Cog object
+        # Client CogManager no longer handles movement, server does
         
-    def spawnCog(self, type='A', head=None, pos=(0,0,0), name="Cog", level=1):
-        cog = Cog(type, head, name=name, level=level)
+    def spawnCog(self, type='A', head=None, pos=(0,0,0), name="Cog", level=1, cogId=0):
+        if cogId in self.cogs:
+            self.cogs[cogId].cleanup()
+            
+        cog = Cog(type, head, name=name, level=level, cogId=cogId)
         cog.setPos(*pos)
-        cog.orig_pos = Point3(*pos)
-        cog.target_pos = cog.orig_pos + Point3(random.uniform(-1255, 1255), random.uniform(-1255, 1255), 0)
-        self.cogs.append(cog)
+        self.cogs[cogId] = cog
         return cog
 
-    def update(self, task):
-        dt = globalClock.getDt()
-        
-        # Filter out cogs that have been cleaned up
-        self.cogs = [cog for cog in self.cogs if not cog.node.isEmpty()]
-        
-        for cog in self.cogs:
-            # Skip cogs that are in a battle
-            if hasattr(cog, 'inBattle') and cog.inBattle:
-                continue
-                
-            dist = (cog.node.getPos() - cog.target_pos).length()
-            if dist > 1:
-                cog.node.lookAt(cog.target_pos)
-                cog.node.setPos(cog.node.getPos() + cog.node.getQuat().getForward() * 5 * dt)
-                if cog.node.getCurrentAnim() != 'walk':
-                    cog.node.loop('walk')
-            else:
-                cog.target_pos = cog.orig_pos + Point3(random.uniform(-50, 50), random.uniform(-50, 50), 0)
-        return Task.cont
+    def removeCog(self, cogId):
+        if cogId in self.cogs:
+            self.cogs[cogId].cleanup()
+            del self.cogs[cogId]
+
+    def updateCog(self, cogId, pos, h, anim):
+        if cogId in self.cogs:
+            cog = self.cogs[cogId]
+            if not cog.inBattle:
+                cog.setPos(*pos)
+                cog.setH(h)
+                if cog.node.getCurrentAnim() != anim:
+                    cog.node.loop(anim)
+
+    def cleanup(self):
+        for cog in self.cogs.values():
+            cog.cleanup()
+        self.cogs = {}

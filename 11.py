@@ -28,9 +28,3 @@ G["music"] = loader.loadSfx('phase_3.5/audio/bgm/TC_SZ.ogg')
 G["music"].setLoop(True)
 G["music"].play()
 
-from cog import CogManager
-if not hasattr(base, "cogMgr"):
-    base.cogMgr = CogManager()
-base.cogMgr.spawnCog('A', 'phase_3.5/models/char/suitA-heads.bam', (0, 40, 0), name="Flunky")
-base.cogMgr.spawnCog('B', 'phase_3.5/models/char/suitB-heads.bam', (20, 60, 0), name="Pencil Pusher")
-base.cogMgr.spawnCog('C', 'phase_3.5/models/char/suitC-heads.bam', (-20, 80, 0), name="Yesman")

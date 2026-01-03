@@ -96,6 +96,58 @@ class Networking:
             if hasattr(base, "chatMgr"):
                 base.chatMgr.displayMessage(player_id, text)
 
+        elif msgID == 7: # COG SPAWN
+            cogId = it.getUint32()
+            type = it.getString()
+            name = it.getString()
+            level = it.getUint8()
+            x, y, z = it.getFloat32(), it.getFloat32(), it.getFloat32()
+            h = it.getFloat32()
+            
+            if hasattr(base, "cogMgr"):
+                base.cogMgr.spawnCog(type=type, pos=(x,y,z), name=name, level=level, cogId=cogId)
+                base.cogMgr.cogs[cogId].setH(h)
+
+        elif msgID == 8: # COG POS
+            numCogs = it.getUint16()
+            for _ in range(numCogs):
+                cogId = it.getUint32()
+                x, y, z = it.getFloat32(), it.getFloat32(), it.getFloat32()
+                h = it.getFloat32()
+                anim = it.getString()
+                if hasattr(base, "cogMgr"):
+                    base.cogMgr.updateCog(cogId, (x,y,z), h, anim)
+
+        elif msgID == 11: # COG DESPAWN
+            cogId = it.getUint32()
+            if hasattr(base, "cogMgr"):
+                base.cogMgr.removeCog(cogId)
+
+        elif msgID == 9: # BATTLE START
+            cogId = it.getUint32()
+            toonId = it.getUint32()
+            if hasattr(base, "cogMgr") and cogId in base.cogMgr.cogs:
+                cog = base.cogMgr.cogs[cogId]
+                # Find the toon
+                toon = None
+                if toonId == id(self.connection): # Local toon - Wait, id(connection) isn't what server uses
+                    pass # We handle local battle trigger separately
+                elif toonId in self.remotePlayers:
+                    toon = self.remotePlayers[toonId].toonActor
+                
+                if toon:
+                    if hasattr(base, "battleMgr"):
+                        base.battleMgr.startBattle(toon, cog, remote=True)
+
+        elif msgID == 12: # BATTLE UPDATE
+            cogId = it.getUint32()
+            damage = it.getUint8()
+            hp = it.getUint16()
+            if hasattr(base, "cogMgr") and cogId in base.cogMgr.cogs:
+                cog = base.cogMgr.cogs[cogId]
+                cog.hp = hp
+                cog.updateHpMeter()
+
     def login(self, name, dna, zone, pos, hpr):
         self.playerNames[id(self.connection)] = name
         dg = NetDatagram()
@@ -169,4 +221,17 @@ class Networking:
         dg = NetDatagram()
         dg.addUint8(4)
         dg.addString(text)
+        self.cWriter.send(dg, self.connection)
+
+    def requestBattle(self, cogId):
+        dg = NetDatagram()
+        dg.addUint8(9)
+        dg.addUint32(cogId)
+        self.cWriter.send(dg, self.connection)
+
+    def sendBattleAction(self, cogId, damage):
+        dg = NetDatagram()
+        dg.addUint8(10)
+        dg.addUint32(cogId)
+        dg.addUint8(damage)
         self.cWriter.send(dg, self.connection)

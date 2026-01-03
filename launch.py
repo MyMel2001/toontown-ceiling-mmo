@@ -125,9 +125,7 @@ def loadZone(zoneId):
     # Clean up managed entities
     destroyNPCS()
     if hasattr(base, "cogMgr"):
-        for cog in base.cogMgr.cogs:
-            cog.cleanup()
-        base.cogMgr.cogs = []
+        base.cogMgr.cleanup()
     
     if hasattr(base, "net"):
         base.net.changeZone(zoneId)
@@ -417,6 +415,9 @@ def start_game(toon_index):
 
     from battle import BattleManager
     base.battleMgr = BattleManager()
+
+    from cog import CogManager
+    base.cogMgr = CogManager()
     
     loadZone(1)
     onScreenDebug.enabled = True
@@ -431,7 +432,7 @@ def battleTriggerTask(task):
     if base.battleMgr.currentBattle:
         return Task.cont
 
-    for cog in base.cogMgr.cogs:
+    for cog in base.cogMgr.cogs.values():
         if cog.node.isEmpty():
             continue
         if (localAvatar.getPos() - cog.node.getPos()).length() < 5:

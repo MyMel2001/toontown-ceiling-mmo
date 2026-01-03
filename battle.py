@@ -4,17 +4,20 @@ from direct.fsm.FSM import FSM
 from direct.interval.IntervalGlobal import *
 
 class Battle(FSM):
-    def __init__(self, toon, cog):
+    def __init__(self, toon, cog, remote=False):
         FSM.__init__(self, "Battle")
         self.toon = toon
         self.cog = cog
         self.cog.inBattle = True
+        self.remote = remote
 
-        if hasattr(base, "localAvatar") and hasattr(base.localAvatar, "physControls"):
-            base.localAvatar.physControls.disableAvatarControls()
+        if not self.remote:
+            if hasattr(base, "localAvatar") and hasattr(base.localAvatar, "physControls"):
+                base.localAvatar.physControls.disableAvatarControls()
         
         self.battleFrame = DirectFrame(frameColor=(0, 0, 0, 0.7), frameSize=(-0.8, 0.8, -0.6, 0.6),
                                        pos=(0, 0, -0.4))
+        if self.remote: self.battleFrame.hide()
         
         self.title = DirectLabel(text="Select a Gag", scale=0.1, pos=(0, 0, 0.4), 
                                  parent=self.battleFrame, text_fg=(1,1,1,1), frameColor=(0,0,0,0))
@@ -56,6 +59,9 @@ class Battle(FSM):
         damage = self.gagDamage.get(gagName, 5)
         print(f"Toon uses {gagName}! Deals {damage} damage.")
         
+        if hasattr(base, "net"):
+            base.net.sendBattleAction(self.cog.cogId, damage)
+
         # Load gag prop
         try:
             prop = loader.loadModel(modelPath)
@@ -72,7 +78,7 @@ class Battle(FSM):
         Sequence(
             Wait(0.5),
             Func(self.cog.node.play, "cringe"),
-            Func(self.cog.takeDamage, damage),
+            # Func(self.cog.takeDamage, damage), # Damage now synced from server
             Wait(1.5),
             Func(self.cleanupProp, prop),
             Func(self.checkBattleEnd)
@@ -146,9 +152,11 @@ class BattleManager:
     def __init__(self):
         self.currentBattle = None
         
-    def startBattle(self, toon, cog):
+    def startBattle(self, toon, cog, remote=False):
         if not self.currentBattle:
-            self.currentBattle = Battle(toon, cog)
+            if not remote and hasattr(base, "net"):
+                base.net.requestBattle(cog.cogId)
+            self.currentBattle = Battle(toon, cog, remote=remote)
             self.currentBattle.request("Wait")
 
     def stopBattle(self):
