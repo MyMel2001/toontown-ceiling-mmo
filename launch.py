@@ -173,6 +173,8 @@ def spawnIceCreams():
 def iceCreamTask(task):
     if localAvatar:
         for ic in list(base.iceCreams):
+            if ic.isEmpty():
+                continue
             if (localAvatar.getPos() - ic.getPos()).length() < 5.0:
                 print("Picked up Ice Cream!")
                 ic.removeNode()
@@ -430,6 +432,8 @@ def battleTriggerTask(task):
         return Task.cont
 
     for cog in base.cogMgr.cogs:
+        if cog.node.isEmpty():
+            continue
         if (localAvatar.getPos() - cog.node.getPos()).length() < 5:
             base.battleMgr.startBattle(localAvatar, cog)
             break

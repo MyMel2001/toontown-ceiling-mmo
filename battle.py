@@ -9,6 +9,9 @@ class Battle(FSM):
         self.toon = toon
         self.cog = cog
         self.cog.inBattle = True
+
+        if hasattr(base, "localAvatar") and hasattr(base.localAvatar, "physControls"):
+            base.localAvatar.physControls.disableAvatarControls()
         
         self.battleFrame = DirectFrame(frameColor=(0, 0, 0, 0.7), frameSize=(-0.8, 0.8, -0.6, 0.6),
                                        pos=(0, 0, -0.4))
@@ -130,6 +133,14 @@ class Battle(FSM):
             self.cog.node.setPos(self.cog_orig_pos)
             self.cog.node.loop("neutral")
         self.cog.inBattle = False
+        
+        if hasattr(base, "localAvatar") and hasattr(base.localAvatar, "physControls"):
+            base.localAvatar.physControls.enableAvatarControls()
+
+        if hasattr(base, "battleMgr"):
+            base.battleMgr.stopBattle()
+        
+        self.request("Off")
 
 class BattleManager:
     def __init__(self):
@@ -139,3 +150,6 @@ class BattleManager:
         if not self.currentBattle:
             self.currentBattle = Battle(toon, cog)
             self.currentBattle.request("Wait")
+
+    def stopBattle(self):
+        self.currentBattle = None
