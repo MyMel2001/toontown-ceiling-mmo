@@ -154,7 +154,7 @@ class ToontownServer(ShowBase):
             dg.addFloat32(cog['pos'][1])
             dg.addFloat32(cog['pos'][2])
             dg.addFloat32(cog['h'])
-            dg.addString("walk" if (Vec3(cog['pos']) - Vec3(cog['target_pos'])).length() > 1 else "neutral")
+            dg.addString("Walk" if (Vec3(cog['pos']) - Vec3(cog['target_pos'])).length() > 1 else "Neutral")
 
         for conn, data in self.clients.items():
             if data['zone'] == zoneId:
@@ -227,7 +227,7 @@ class ToontownServer(ShowBase):
                 'zone': zone,
                 'pos': (x, y, z),
                 'hpr': (h, p, r),
-                'anim': 'neutral'
+                'anim': 'Neutral'
             }
             print(f"Player {name} logged in at zone {zone}")
             

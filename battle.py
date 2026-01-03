@@ -71,13 +71,13 @@ class Battle(FSM):
             prop = None
 
         # Play animation based on track
-        anim = "throw" if track == "throw" else "walk" # walk as fallback for squirt if not found
+        anim = "Pie Throw" if track == "throw" else "Walk" # Walk as fallback for squirt if not found
         self.toon.play(anim)
         
         # Cog reaction
         Sequence(
             Wait(0.5),
-            Func(self.cog.node.play, "cringe"),
+            Func(self.cog.node.play, "Walk"), # Walk as fallback for cringe for now
             # Func(self.cog.takeDamage, damage), # Damage now synced from server
             Wait(1.5),
             Func(self.cleanupProp, prop),
@@ -87,7 +87,7 @@ class Battle(FSM):
     def checkBattleEnd(self):
         if self.cog.hp <= 0:
             print(f"{self.cog.name} defeated!")
-            self.cog.node.play("walk") # Replace with death animation if available, walk for now
+            self.cog.node.play("Walk") # Replace with death animation if available, Walk for now
             Sequence(
                 Wait(1.0),
                 Func(self.cleanup),
@@ -110,8 +110,8 @@ class Battle(FSM):
         if not self.cog or self.cog.node.isEmpty(): return
         damage = self.cog.level * 2
         print(f"Cog attacks Toon! Deals {damage} damage.")
-        self.cog.node.play("walk") 
-        self.toon.play("cringe")
+        self.cog.node.play("Walk") 
+        self.toon.play("Cringe")
         
         if hasattr(base, "localAvatar"):
             base.localAvatar.hp -= damage
@@ -137,7 +137,7 @@ class Battle(FSM):
         self.battleFrame.destroy()
         if not self.cog.node.isEmpty():
             self.cog.node.setPos(self.cog_orig_pos)
-            self.cog.node.loop("neutral")
+            self.cog.node.loop("Neutral")
         self.cog.inBattle = False
         
         if hasattr(base, "localAvatar") and hasattr(base.localAvatar, "physControls"):

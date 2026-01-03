@@ -365,10 +365,10 @@ def setMovementAnimation(loopName, playRate=1.0):
     global movingNeutral, movingForward, movingRotation, movingBackward, movingJumping
     if not duckBody: return
     
-    movingJumping = 'jump' in loopName
-    movingForward = loopName == 'run'
-    movingNeutral = loopName == 'neutral'
-    if loopName == 'walk':
+    movingJumping = 'Jump' in loopName
+    movingForward = loopName == 'Run'
+    movingNeutral = loopName == 'Neutral'
+    if loopName == 'Walk':
         if playRate == -1.0:
             movingBackward, movingRotation = True, False
         else:
@@ -388,23 +388,23 @@ def handleMovement(task):
     if keyMap['control'] == 1:
         if keyMap['forward'] or keyMap['backward'] or keyMap['left'] or keyMap['right']:
             if not movingJumping:
-                if isAirborne: setMovementAnimation('running-jump-idle')
+                if isAirborne: setMovementAnimation('Running Jump')
                 else:
-                    if keyMap['forward'] and not movingForward: setMovementAnimation('run')
-                    elif keyMap['backward'] and not movingBackward: setMovementAnimation('walk', -1.0)
-                    elif (keyMap['left'] or keyMap['right']) and not movingRotation: setMovementAnimation('walk')
+                    if keyMap['forward'] and not movingForward: setMovementAnimation('Run')
+                    elif keyMap['backward'] and not movingBackward: setMovementAnimation('Walk', -1.0)
+                    elif (keyMap['left'] or keyMap['right']) and not movingRotation: setMovementAnimation('Walk')
         else:
             if not movingJumping:
-                if isAirborne: setMovementAnimation('jump-idle')
-                elif not movingNeutral: setMovementAnimation('neutral')
+                if isAirborne: setMovementAnimation('Jump')
+                elif not movingNeutral: setMovementAnimation('Neutral')
     elif keyMap['forward'] == 1:
-        if not movingForward and not isAirborne: setMovementAnimation('run')
+        if not movingForward and not isAirborne: setMovementAnimation('Run')
     elif keyMap['backward'] == 1:
-        if not movingBackward and not isAirborne: setMovementAnimation('walk', -1.0)
+        if not movingBackward and not isAirborne: setMovementAnimation('Walk', -1.0)
     elif keyMap['left'] or keyMap['right']:
-        if not movingRotation and not isAirborne: setMovementAnimation('walk')
+        if not movingRotation and not isAirborne: setMovementAnimation('Walk')
     else:
-        if not isAirborne and not movingNeutral: setMovementAnimation('neutral')
+        if not isAirborne and not movingNeutral: setMovementAnimation('Neutral')
     return Task.cont
 
 def start_game(toon_index):

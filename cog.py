@@ -12,8 +12,8 @@ suitTypes = {
 }
 
 suitAnims = {
-    'neutral': 'phase_4/models/char/suitA-neutral.bam',
-    'walk': 'phase_4/models/char/suitA-walk.bam',
+    'Neutral': 'phase_4/models/char/suitA-neutral.bam',
+    'Walk': 'phase_4/models/char/suitA-walk.bam',
 }
 # Note: For simplicity using A anims for all for now, or I'd need to map them all.
 
@@ -27,16 +27,16 @@ class Cog:
         
         # Determine correct animation paths based on type
         # Suit A and B are usually in phase_4, C is in phase_3.5
-        neutral_anim = suitAnims['neutral'].replace('A', type)
-        walk_anim = suitAnims['walk'].replace('A', type)
+        neutral_anim = suitAnims['Neutral'].replace('A', type)
+        walk_anim = suitAnims['Walk'].replace('A', type)
         
         if type == 'C':
             neutral_anim = neutral_anim.replace('phase_4', 'phase_3.5')
             walk_anim = walk_anim.replace('phase_4', 'phase_3.5')
             
         self.node = Actor(suitTypes[type], {
-            'neutral': neutral_anim,
-            'walk': walk_anim
+            'Neutral': neutral_anim,
+            'Walk': walk_anim
         })
         
         # Add nametag
@@ -83,10 +83,10 @@ class Cog:
                     head_model.reparentTo(self.node.find('**/+Character').getChild(0))
                 
                 # Filter Cog head pieces
-                for part in head_model.getChildren():
+                for part in head_model.findAllMatches('**'):
                     part.hide()
                 
-                cog_head_name = name.lower().replace(" ", "")
+                cog_head_name = name.lower().replace(" ", "").replace("&", "")
                 head_part = head_model.find(f"**/{cog_head_name}*")
                 
                 if head_part.isEmpty():
@@ -94,16 +94,24 @@ class Cog:
                     if "flunky" in cog_head_name: head_part = head_model.find("**/flunky")
                     elif "pencilpusher" in cog_head_name: head_part = head_model.find("**/pencilpusher")
                     elif "yesman" in cog_head_name: head_part = head_model.find("**/yesman")
+                    elif "mover" in cog_head_name: head_part = head_model.find("**/movershaker")
+                    elif "bigcheese" in cog_head_name: head_part = head_model.find("**/thebigcheese")
                 
                 if not head_part.isEmpty():
                     head_part.show()
+                    # Also show all parents up to the head_model root
+                    p = head_part.getParent()
+                    while p and p != head_model:
+                        p.show()
+                        p = p.getParent()
                 elif head_model.getNumChildren() > 0:
                     head_model.getChild(0).show()
+                    head_model.getChild(0).showThrough()
             except Exception as e:
                 print(f"Failed to load Cog head: {head_path}: {e}")
             
         self.node.reparentTo(render)
-        self.node.loop('neutral')
+        self.node.loop('Neutral')
         self.name = name
         self.inBattle = False
         

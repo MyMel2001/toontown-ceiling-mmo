@@ -190,14 +190,14 @@ class Networking:
         dg.addFloat32(hpr[2])
         
         # Get current animation
-        anim = "neutral"
+        anim = "Neutral"
         G = get_builtins()
         # This is a bit hacky, but we can check the moving flags in launch.py
         # Or just use the actor's current anim
         # For now, let's assume we can get it from G or base.localAvatar
         if hasattr(base.localAvatar, "getCurrentAnim"):
              anim = base.localAvatar.getCurrentAnim()
-             if anim is None: anim = "neutral"
+             if anim is None: anim = "Neutral"
         
         dg.addString(anim)
         self.cWriter.send(dg, self.connection)
