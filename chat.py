@@ -49,7 +49,7 @@ class ChatManager:
         for i, m in enumerate(reversed(self.messages[-20:])):
             lbl = DirectLabel(
                 text=m,
-                scale=0.1,
+                scale=0.18,
                 pos=(-0.9, 0, 0.8 - i*0.15),
                 frameColor=(0,0,0,0),
                 text_align=TextNode.ALeft,

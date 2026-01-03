@@ -250,10 +250,19 @@ class LaffMeter(DirectFrame):
         self.frown = self.container.find("**/frown")
         self.teeth = self.container.find("**/teeth")
         
-        self.hpLabel = DirectLabel(parent=self, text="", scale=0.4, pos=(0, 0, -0.1), 
+        self.hpLabel = DirectLabel(parent=self, text="", scale=0.6, pos=(0, 0, 0.1), 
                                    text_fg=(0,1,0,1), frameColor=(0,0,0,0))
         self.isSad = False
+        self.lastHp = -1
+        self.lastMaxHp = -1
+        base.taskMgr.add(self.updateTask, "updateLaffTask")
         self.updateLaff()
+
+    def updateTask(self, task):
+        if localAvatar:
+            if localAvatar.hp != self.lastHp or localAvatar.maxHp != self.lastMaxHp:
+                self.updateLaff()
+        return Task.cont
 
     def updateLaff(self):
         if not localAvatar: return
@@ -261,7 +270,9 @@ class LaffMeter(DirectFrame):
             localAvatar.hp = 0
         hp = localAvatar.hp
         maxHp = localAvatar.maxHp
-        self.hpLabel['text'] = str(int(hp))
+        self.lastHp = hp
+        self.lastMaxHp = maxHp
+        self.hpLabel['text'] = f"{int(hp)} {int(maxHp)}"
         
         if hp <= 0:
             self.hpLabel['text_fg'] = (1, 0, 0, 1) # Red
