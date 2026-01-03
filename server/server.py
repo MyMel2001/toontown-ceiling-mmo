@@ -1,10 +1,13 @@
 from panda3d.core import *
+from pandac.PandaModules import *
+ConfigVariableString("window-type","none").setValue("none")
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 import sys
 
-class ToontownServer():
+class ToontownServer(ShowBase):
     def __init__(self):
+        ShowBase.__init__(self)
         self.cManager = QueuedConnectionManager()
         self.cListener = QueuedConnectionListener(self.cManager, 0)
         self.cReader = QueuedConnectionReader(self.cManager, 0)
