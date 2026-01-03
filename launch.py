@@ -153,6 +153,21 @@ def loadZone(zoneId):
         print(f"Error loading zone {zID}: {e}")
 G["loadZone"] = loadZone
 
+def spawnOneIceCream(task=None):
+    if not hasattr(base, "iceCreams"):
+        base.iceCreams = []
+        
+    if zID == 1 and len(base.iceCreams) < 10:
+        x = random.uniform(-100, 100)
+        y = random.uniform(-100, 100)
+        ic = loader.loadModel("phase_4/models/props/icecream.bam")
+        ic.reparentTo(render)
+        ic.setPos(x, y, 0.5)
+        ic.setScale(1.5)
+        base.iceCreams.append(ic)
+    
+    return Task.again if task else None
+
 def spawnIceCreams():
     if not hasattr(base, "iceCreams"):
         base.iceCreams = []
@@ -160,13 +175,7 @@ def spawnIceCreams():
     # Randomly spawn ice cream cones in playgrounds (for now zone 1)
     if zID == 1:
         for i in range(10):
-            x = random.uniform(-100, 100)
-            y = random.uniform(-100, 100)
-            ic = loader.loadModel("phase_4/models/props/icecream.bam")
-            ic.reparentTo(render)
-            ic.setPos(x, y, 0.5)
-            ic.setScale(1.5)
-            base.iceCreams.append(ic)
+            spawnOneIceCream()
 
 def iceCreamTask(task):
     if localAvatar:
@@ -177,7 +186,7 @@ def iceCreamTask(task):
                 print("Picked up Ice Cream!")
                 ic.removeNode()
                 base.iceCreams.remove(ic)
-                localAvatar.hp = min(localAvatar.maxHp, localAvatar.hp + 10)
+                localAvatar.hp = min(localAvatar.maxHp, localAvatar.hp + random.randint(1, 6))
                 if hasattr(base, "laffMeter"):
                     base.laffMeter.updateLaff()
     return Task.cont
@@ -369,6 +378,7 @@ def start_game(toon_index):
     global duckBody, localAvatar, walkControls
     base.taskMgr.add(battleTriggerTask, "BattleTriggerTask")
     base.taskMgr.add(iceCreamTask, "IceCreamTask")
+    base.taskMgr.doMethodLater(15, spawnOneIceCream, "respawnIceCreamTask")
     toon = pickAToon(toon_index)
     duckBody = toon.toonActor
     localAvatar = duckBody
