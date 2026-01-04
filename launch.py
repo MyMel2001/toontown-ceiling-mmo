@@ -23,6 +23,19 @@ import math
 base = ShowBase()
 base.disableMouse()
 
+def changeMouseCursor(cursorFile):
+        winprops=WindowProperties()
+        winprops.setCursorFilename
+        (Filename.binaryFilename(cursorFile))
+        base.win.requestProperties(winprops)
+
+
+
+winprops = WindowProperties()
+defaultCursor = winprops.getCursorFilename()
+winprops.setCursorFilename("phase_3/etc/toonmono.cur")
+base.win.requestProperties(winprops)
+
 # Setup Cull Bins
 cbm = CullBinManager.getGlobalPtr()
 if cbm.findBin('shadow') == -1:
@@ -468,8 +481,8 @@ def start_game(toon_index):
         head_joint = duckBody.find('**/joint_head')
     
     nametag = createNametag(toonNameArray[toon_index], (1,1,1,.5), (0,0,1,1))
-    nametag.setPos(0,0,3.2)
-    nametag.setScale(.5, 0, .5)
+    nametag.setPos(0,0,2.2)
+    nametag.setScale(1, 1, 1)
     if not head_joint.isEmpty():
         nametag.reparentTo(head_joint)
     else:
@@ -478,7 +491,7 @@ def start_game(toon_index):
             nametag.reparentTo(head[0])
 
     duckBody.reparentTo(render)
-    offset = 3.2375
+    offset = 3.7375
     base.camera.reparentTo(duckBody)
     base.camera.setPos(0, -10.0 - offset, offset)
     
