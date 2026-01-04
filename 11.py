@@ -12,12 +12,12 @@ currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 # Move character further out of the tunnel trigger zone
 base.localAvatar.setPos(0, 20, 0)
 
-# Tunnels in Silly Street
+# Tunnels in Loopy Lane
 LoadingZone = G["LoadingZone"]
 # Back to TTC Playground
-LoadingZone.define(-5, 0, 5, 10, 1)
-# Forward to Melodyland Playground (end of street)
-LoadingZone.define(-5, 590, 5, 600, 0)
+LoadingZone.define(-95.03, -84.94, -85.03, -74.94, 1)
+# Forward to Daisy's Garden Playground (end of street)
+LoadingZone.define(-365, -405, -355, -395, 3)
 
 # Setup tunnel at end of street to Melodyland
 # Coordinates for MML tunnel in TTC 2100 are approx (0, 600, 0)
@@ -27,4 +27,3 @@ G["music"].stop()
 G["music"] = loader.loadSfx('phase_3.5/audio/bgm/TC_SZ.ogg')
 G["music"].setLoop(True)
 G["music"].play()
-

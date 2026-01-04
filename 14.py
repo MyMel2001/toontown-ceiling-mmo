@@ -10,9 +10,9 @@ base.localAvatar.setPos(0, 20, 0)
 # Tunnels in Elm Street
 LoadingZone = G["LoadingZone"]
 # Back to DG Playground
-LoadingZone.define(-5, 0, 5, 10, 3)
+LoadingZone.define(-65.8, 3.2, -55.8, 13.2, 3)
 # Forward to TTC (Punchline Place)
-LoadingZone.define(-5, 590, 5, 600, 1)
+LoadingZone.define(673.14, 93.25, 683.14, 103.25, 1)
 
 # Load tunnel back to DG
 # G["loadStreet"]('phase_8/dna/daisys_garden_sz.xml', pos=(0,0,0))
@@ -23,4 +23,3 @@ G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GARDEN_nbrhood.ogg')
 G["music"].setLoop(True)
 G["music"].play()
-

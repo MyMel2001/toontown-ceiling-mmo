@@ -12,10 +12,11 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to DL Playground
-LoadingZone.define(-5, 0, 5, 10, 10)
+LoadingZone.define(-5, 30, 15, 50, 10)
+# Forward to Minnie's Melody Land (Baritone Boulevard)
+LoadingZone.define(-104.28, -513.92, -94.28, -503.92, 0)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/DL_sz.ogg')
 G["music"].setLoop(True)
 G["music"].play()
-

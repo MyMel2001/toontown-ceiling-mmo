@@ -12,10 +12,11 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to DD Playground
-LoadingZone.define(-5, 0, 5, 10, 2)
+LoadingZone.define(155, -55, 165, -45, 2)
+# Forward to TTC (Silly Street)
+LoadingZone.define(365, -35, 375, -25, 1)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/DD_sz.ogg')
 G["music"].setLoop(True)
 G["music"].play()
-

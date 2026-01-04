@@ -11,12 +11,12 @@ currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 # Setup tunnel collision to go back to TTC
 base.localAvatar.setPos(0, 20, 0)
 
-# Tunnels in Loopy Lane
+# Tunnels in Punchline Place
 LoadingZone = G["LoadingZone"]
 # Back to TTC Playground
-LoadingZone.define(-5, 0, 5, 10, 1)
-# Forward to Donald's Docks (end of street)
-LoadingZone.define(-5, 590, 5, 600, 2)
+LoadingZone.define(-80, 110, -70, 120, 1)
+# Forward to Minnie's Melody Land (end of street)
+LoadingZone.define(-585, -35, -575, -25, 0)
 
 # Setup tunnel at end of street to Donald's Docks
 # G["loadStreet"]('phase_6/dna/donalds_dock_sz.xml', pos=(0, 600, 0), zone_key="next_sz")
@@ -25,4 +25,3 @@ G["music"].stop()
 G["music"] = loader.loadSfx('phase_3.5/audio/bgm/TC_SZ.ogg')
 G["music"].setLoop(True)
 G["music"].play()
-

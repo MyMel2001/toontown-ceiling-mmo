@@ -12,10 +12,11 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to BR Playground
-LoadingZone.define(-5, 0, 5, 10, 9)
+LoadingZone.define(170, -85, 180, -75, 9)
+# Forward to Donald's Dock (Lighthouse Lane)
+LoadingZone.define(435, 205, 445, 215, 2)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/TB_sz.ogg')
 G["music"].setLoop(True)
 G["music"].play()
-

@@ -12,10 +12,11 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to MML Playground
-LoadingZone.define(-5, 0, 5, 10, 0)
+LoadingZone.define(-170, 35, -160, 45, 0)
+# Forward to TTC (Loopy Lane)
+LoadingZone.define(-464.72, 205, -454.72, 215, 1)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/WW_sz.ogg')
 G["music"].setLoop(True)
 G["music"].play()
-
