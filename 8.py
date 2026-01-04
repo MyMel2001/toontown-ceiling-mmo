@@ -8,7 +8,7 @@ base.localAvatar.setPos(0, 0, 0)
 G = get_builtins()
 LoadingZone = G["LoadingZone"]
 # Cashbot HQ Tunnel to Donald's Dreamland
-LoadingZone.define(-5, -5, 5, 5, 10)
+LoadingZone.define(-5, 0, 5, 10, 10)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_9/audio/bgm/encntr_suit_winning_variation.ogg')

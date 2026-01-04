@@ -14,9 +14,9 @@ base.localAvatar.setPos(0, 20, 0)
 # Tunnels in Loopy Lane
 LoadingZone = G["LoadingZone"]
 # Back to TTC Playground
-LoadingZone.define(-5, -5, 5, 5, 1)
+LoadingZone.define(-5, 0, 5, 10, 1)
 # Forward to Donald's Docks (end of street)
-LoadingZone.define(-5, 595, 5, 605, 2)
+LoadingZone.define(-5, 590, 5, 600, 2)
 
 # Setup tunnel at end of street to Donald's Docks
 # G["loadStreet"]('phase_6/dna/donalds_dock_sz.xml', pos=(0, 600, 0), zone_key="next_sz")

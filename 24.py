@@ -12,7 +12,7 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to BR Playground
-LoadingZone.define(-5, -5, 5, 5, 9)
+LoadingZone.define(-5, 0, 5, 10, 9)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/TB_sz.ogg')

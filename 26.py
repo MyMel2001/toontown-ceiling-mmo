@@ -12,7 +12,7 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to DL Playground
-LoadingZone.define(-5, -5, 5, 5, 10)
+LoadingZone.define(-5, 0, 5, 10, 10)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/DL_sz.ogg')

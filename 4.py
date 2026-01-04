@@ -7,7 +7,7 @@ base.localAvatar.setPos(196,322.864,0)
 
 LoadingZone = G["LoadingZone"]
 # Goofy Speedway Tunnel to TTC
-LoadingZone.define(-15, 83.1, -25, 73.1, 1)
+LoadingZone.define(-15, 73.1, -25, 63.1, 1)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GS_Race_BKR.ogg')

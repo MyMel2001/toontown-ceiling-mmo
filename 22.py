@@ -12,7 +12,7 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to DG Playground
-LoadingZone.define(-5, -5, 5, 5, 3)
+LoadingZone.define(-5, 0, 5, 10, 3)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GARDEN_sz.ogg')
