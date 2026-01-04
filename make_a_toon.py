@@ -162,7 +162,7 @@ class MakeAToon:
                          None, None, 0, None, None, None, "Neutral", True, False)
         self.toon.toonActor.reparentTo(self.mainFrame)
         self.toon.toonActor.setPos(0, 5, -0.5)
-        self.toon.toonActor.setScale(.24,.24,.24)
+        self.toon.toonActor.setScale(.25,.25,.25)
         self.toon.toonActor.setH(180)
 
     def done(self):
@@ -175,7 +175,6 @@ class MakeAToon:
                self.shirt, short_tex, skirt_tex, self.shirt_color, self.bottom_color,
                None, None, 0, None, None, None, "Neutral", True, False]
         self.toon.toonActor.setScale(1,1,1)
-        
         toonDnaArray.append(dna)
         toonNameArray.append(name)
         

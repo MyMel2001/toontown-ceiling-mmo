@@ -358,6 +358,7 @@ def actual_load_street(path, pos, hpr, zone_key=None):
     
     if duckBody:
         duckBody.reparentTo(render)
+        duckBody.setScale(1,1,1)
     
     currentLand.currentLandModels.clear()
     print(f"Progressive loading: {path}")
@@ -468,6 +469,7 @@ def start_game(toon_index):
     
     nametag = createNametag(toonNameArray[toon_index], (1,1,1,.5), (0,0,1,1))
     nametag.setPos(0,0,2)
+    nametag.setScale(.5, 0, .5)
     if not head_joint.isEmpty():
         nametag.reparentTo(head_joint)
     else:

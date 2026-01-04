@@ -137,7 +137,8 @@ class DNALoader:
 
     def handleWall(self, xml_node, parent):
         code = xml_node.get('code')
-        height = float(xml_node.get('height', 10))
+        height = float(xml_node.get('height', 24) or 1000)
+        width = float(xml_node.get('width', 20) or 255)
         if code in self.storage:
             entry = self.storage[code]
             model_path = entry['path']
@@ -158,7 +159,9 @@ class DNALoader:
                 model.copyTo(new_np)
                 # Walls are often composed of several heights, 
                 # but Toontown DNA uses scaling to achieve height.
-                new_np.setSz(height / 10.0) # Assume base height is 10
+                new_np.setSx(width) # Assume base width is 20
+                new_np.setSy(width) # Assume base width is 20
+                new_np.setSz(height) # Assume base height is 24
                 self.parseNode(xml_node, new_np)
             except Exception as e:
                 print(f"Failed to load wall model {model_path} for code {code}: {e}")
@@ -189,6 +192,7 @@ class DNALoader:
                     model = full_model
                 
                 new_np = sign_node.attachNewNode(code)
+                new_np.setPos(new_np, .5, -.5, 0)
                 model.copyTo(new_np)
             except Exception as e:
                 print(f"Failed to load sign model {model_path} for code {code}: {e}")
@@ -206,13 +210,14 @@ class DNALoader:
             
             # Load default Toontown font
             try:
-                font = loader.loadFont('phase_3/fonts/MickeyFont.ttf')
+                font = loader.loadFont('phase_3/fonts/Comic.ttf')
                 if font:
                     tn.setFont(font)
             except:
                 pass
 
             np = baseline_node.attachNewNode(tn)
-            np.setScale(2) # Default scale for text
+            np.setPos(np, -1, -1, 0)
+            np.setScale(.69) # Default scale for text
         
         self.parseNode(xml_node, baseline_node)
