@@ -67,9 +67,9 @@ class Battle(FSM):
             z_pos = z_start - row * z_offset
             
             # Auto-sizing: slightly scale down for long names or many gags
-            btn_scale = 0.045
+            btn_scale = 0.064
             if len(name) > 15:
-                btn_scale = 0.035
+                btn_scale = 0.064
             if numGags > 12:
                 btn_scale *= 0.8
 

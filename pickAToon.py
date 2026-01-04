@@ -20,7 +20,7 @@ def createNPC(dnaArray,x,y,z,h,p,r,name):
     npc.toonActor.setHpr(h,p,r)
     head = npc.toonActor.findAllMatches('**/head*')
     nametag = createNametag(name, (1,1,1,.5), (1,1,0,1))
-    nametag.setPos(0,0,2)
+    nametag.setPos(0,0,3.2)
     nametag.reparentTo(head[0])
     npcArray.append(npc)
     npc.toonActor.reparentTo(render)

@@ -77,7 +77,7 @@ class Networking:
                 # Create nametag
                 head = newToon.toonActor.findAllMatches('**/head*')
                 nametag = createNametag(name, (1,1,1,.5), (0,0,1,1))
-                nametag.setPos(0,0,2)
+                nametag.setPos(0,0,3.2)
                 nametag.reparentTo(head[0])
                 
                 self.remotePlayers[player_id] = newToon

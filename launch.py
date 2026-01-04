@@ -468,7 +468,7 @@ def start_game(toon_index):
         head_joint = duckBody.find('**/joint_head')
     
     nametag = createNametag(toonNameArray[toon_index], (1,1,1,.5), (0,0,1,1))
-    nametag.setPos(0,0,2)
+    nametag.setPos(0,0,3.2)
     nametag.setScale(.5, 0, .5)
     if not head_joint.isEmpty():
         nametag.reparentTo(head_joint)

@@ -50,7 +50,7 @@ class Cog:
         
         if not head_joint.isEmpty():
             self.nametag.reparentTo(head_joint)
-            self.nametag.setPos(0, 0, 2)
+            self.nametag.setPos(0, 0, 3.2)
         else:
             self.nametag.reparentTo(self.node)
             self.nametag.setPos(0, 0, 8)
