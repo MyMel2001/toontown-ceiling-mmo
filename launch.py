@@ -508,7 +508,7 @@ def start_game(toon_index):
     onScreenDebug.enabled = True
     base.taskMgr.add(handleMovement, 'controlManager')
     base.taskMgr.add(updateOnScreenDebug, 'UpdateOSD')
-    DirectButton(text=("Back to TTC", "Click", "...", "disabled"), scale=.08, pos=(0, -.5, .5), command=lambda: loadZone(1))
+    DirectButton(text=("Back to previous safezone", "Click", "...", "disabled"), scale=.08, pos=(0, -.5, .5), command=lambda: loadZone(1))
 
 def battleTriggerTask(task):
     if not localAvatar or localAvatar.hp <= 0 or not hasattr(base, "cogMgr") or not hasattr(base, "battleMgr"):
