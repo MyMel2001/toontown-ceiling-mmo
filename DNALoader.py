@@ -210,7 +210,7 @@ class DNALoader:
             
             # Load default Toontown font
             try:
-                font = loader.loadFont('phase_3/fonts/Comic.ttf')
+                font = loader.loadFont('phase_3/fonts/ImpressBT.ttf')
                 if font:
                     tn.setFont(font)
             except:
