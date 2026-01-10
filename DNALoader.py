@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from panda3d.core import *
 from direct.actor.Actor import Actor
+import os
 
 global scene
 
@@ -28,10 +29,10 @@ class DNALoader:
         try:
             tree = ET.parse(path)
             root = tree.getroot()
-            
+
             scene = NodePath("dna_scene")
             scene.reparentTo(parent)
-            
+
             self.parseNode(root, scene)
             return scene
         except Exception as e:
@@ -47,7 +48,6 @@ class DNALoader:
                 self.parseNode(child, group_node)
             elif child.tag == 'visgroup':
                 vis_node = panda_node.attachNewNode(child.get('zone', 'visgroup'))
-                # Visgroups usually have their own pos/hpr
                 self.parseNode(child, vis_node)
             elif child.tag == 'landmark_building':
                 self.handleLandmark(child, panda_node)
@@ -87,17 +87,16 @@ class DNALoader:
                     model = full_model.find("**/" + node_name)
                 else:
                     model = full_model.find("**/" + code)
-                
+
                 if model.isEmpty():
                     model = full_model
-                
+
                 new_np = parent.attachNewNode(code)
                 model.copyTo(new_np)
                 self.parseNode(xml_node, new_np)
             except Exception as e:
                 print(f"Failed to load model {model_path} for code {code}: {e}")
         else:
-            # Create a dummy node to hold transform
             dummy = parent.attachNewNode(xml_node.get('name', xml_node.get('code', 'prop')))
             self.parseNode(xml_node, dummy)
 
@@ -115,10 +114,10 @@ class DNALoader:
                     model = full_model.find("**/" + node_name)
                 else:
                     model = full_model.find("**/" + code)
-                
+
                 if model.isEmpty():
                     model = full_model
-                
+
                 new_np = parent.attachNewNode(code)
                 model.copyTo(new_np)
                 self.parseNode(xml_node, new_np)
@@ -132,7 +131,6 @@ class DNALoader:
     def handleFlatBuilding(self, xml_node, parent):
         building = parent.attachNewNode("flat_building")
         width = float(xml_node.get('width', 10))
-        # We don't really use width yet but we could scale the walls
         self.parseNode(xml_node, building)
 
     def handleWall(self, xml_node, parent):
@@ -151,17 +149,15 @@ class DNALoader:
                     model = full_model.find("**/" + node_name)
                 else:
                     model = full_model.find("**/" + code)
-                
+
                 if model.isEmpty():
                     model = full_model
-                
+
                 new_np = parent.attachNewNode(code)
                 model.copyTo(new_np)
-                # Walls are often composed of several heights, 
-                # but Toontown DNA uses scaling to achieve height.
-                new_np.setSx(width) # Assume base width is 20
-                new_np.setSy(width) # Assume base width is 20
-                new_np.setSz(height) # Assume base height is 24
+                new_np.setSx(width)
+                new_np.setSy(width)
+                new_np.setSz(height)
                 self.parseNode(xml_node, new_np)
             except Exception as e:
                 print(f"Failed to load wall model {model_path} for code {code}: {e}")
@@ -173,7 +169,7 @@ class DNALoader:
         sign_node = parent.find("**/sign_origin")
         if sign_node.isEmpty():
             sign_node = parent.attachNewNode("sign")
-        
+
         code = xml_node.get('code')
         if code and code in self.storage:
             entry = self.storage[code]
@@ -187,37 +183,39 @@ class DNALoader:
                     model = full_model.find("**/" + node_name)
                 else:
                     model = full_model.find("**/" + code)
-                
+
                 if model.isEmpty():
                     model = full_model
-                
+
                 new_np = sign_node.attachNewNode(code)
                 new_np.setPos(new_np, .5, -.5, 0)
                 model.copyTo(new_np)
             except Exception as e:
                 print(f"Failed to load sign model {model_path} for code {code}: {e}")
-        
+
         self.parseNode(xml_node, sign_node)
 
     def handleBaseline(self, xml_node, parent):
         baseline_node = parent.attachNewNode("baseline")
-        
-        # Toontown baselines can have text
+
         text_node = xml_node.find('text')
         if text_node is not None and text_node.text:
             tn = TextNode('dna_text')
             tn.setText(text_node.text)
-            
-            # Load default Toontown font
+
             try:
-                font = loader.loadFont('phase_3/fonts/ImpressBT.ttf')
-                if font:
-                    tn.setFont(font)
-            except:
-                pass
+                font_path = 'phase_3/fonts/ImpressBT.ttf'
+                if os.path.exists(font_path):
+                    font = loader.loadFont(font_path)
+                    if font:
+                        tn.setFont(font)
+                else:
+                    print(f"Font file not found at {font_path}")
+            except Exception as e:
+                print(f"Error loading font: {e}")
 
             np = baseline_node.attachNewNode(tn)
             np.setPos(np, -1, -1, 0)
-            np.setScale(.69) # Default scale for text
-        
+            np.setScale(.69)
+
         self.parseNode(xml_node, baseline_node)
