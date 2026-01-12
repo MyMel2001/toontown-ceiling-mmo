@@ -1,0 +1,6 @@
+{
+    "editor.inlineSuggest.enabled": true,
+    "python.autoComplete.extraPaths": [
+        "/home/nm/.vscode-oss/extensions/continue.continue-0.0.412-linux-x64"
+    ]
+}

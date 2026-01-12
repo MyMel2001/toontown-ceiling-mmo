@@ -13,7 +13,7 @@ base.localAvatar.setPos(0, 20, 0)
 LoadingZone = G["LoadingZone"]
 # Back to DD Playground
 LoadingZone.define(-190, -130, -180, -120, 2)
-# Forward to Daisy's Garden (Labyrinth Lane)
+# Forward to Daisy's Garden
 LoadingZone.define(-300, -435, -290, -425, 3)
 
 G["music"].stop()
