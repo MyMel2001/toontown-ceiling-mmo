@@ -9,14 +9,17 @@ tunnelA.setPos(0, 0, 0.025)
 base.localAvatar.setPos(22.9513,60.1588,0.025)
 
 LoadingZone = G["LoadingZone"]
-# Elm Street (5102 -> 14)
-LoadingZone.define(177.08, 181.78, 187.08, 191.78, 14)
-# Labyrinth Lane (5201 -> 21)
-LoadingZone.define(-109.48, 282.95, -99.48, 292.95, 21)
-# Oak Street (5301 -> 22)
-LoadingZone.define(-65.12, -94.82, -55.12, -84.82, 22)
-# To Sellbot HQ (Based on neighborhood sign or tunnel in DG)
-LoadingZone.define(-15, -15, 15, 15, 5)
+# Elm Street (5102 -> 14) - Tunnel at (187.08, 191.78, 3.3) facing 126 HPR
+# Zone placed in front of tunnel (extending toward -X and +Y)
+LoadingZone.define(200, 205, 220, 230, 14)
+# Labyrinth Lane (5201 -> 21) - Tunnel at (-109.48, 292.95, 3.36) facing -130 HPR
+# Zone placed in front of tunnel (extending toward +X and -Y)
+LoadingZone.define(-120, 305, -100, 285, 21)
+# Oak Street (5301 -> 22) - Tunnel at (-60.12, -94.82, -6.63) facing 0 HPR
+# Zone placed in front of tunnel (extending toward -Y)
+LoadingZone.define(-70, -105, -50, -85, 22)
+# To Sellbot HQ - Leave this one alone as requested
+# LoadingZone.define(-15, -15, 15, 15, 5)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GARDEN_nbrhood.ogg')

@@ -20,6 +20,124 @@ from DNALoader import DNALoader
 import os
 import math
 
+# Task HUD class with progression system
+class TasksHUD(DirectFrame):
+    def __init__(self):
+        DirectFrame.__init__(self, relief=DGG.RAISED, scale=0.4, pos=(0, 0, 0), frameColor=(0.2, 0.2, 0.3, 0.9))
+        self.hide()
+        
+        # Title
+        self.title = DirectLabel(parent=self, text="TASKS", scale=1.5, pos=(0, 0, 0.85),
+                                 text_fg=(1, 1, 0, 1), frameColor=(0, 0, 0, 0))
+        
+        # Task list container
+        self.taskList = DirectScrolledFrame(parent=self, frameSize=(-2.5, 2.5, -3.5, 2.5),
+                                            canvasSize=(-2.3, 2.3, -15, 2.5),
+                                            pos=(0, 0, -0.3), scale=1.0,
+                                            frameColor=(0.1, 0.1, 0.2, 0.7),
+                                            autoHideScrollBars=False)
+        
+        # Task storage: list of dictionaries with task data
+        self.task_data = []
+        
+        # Initialize task tracking in base
+        if not hasattr(base, 'taskProgress'):
+            base.taskProgress = {}
+        
+        # Sample tasks
+        self.addTask("Welcome to Toontown!", "Explore Toontown Central and have fun!", "explore")
+        self.addTask("Find the Trolley", "Locate the trolley station in TTC.", "trolley")
+        self.addTask("Battle a Cog", "Engage a Cog in battle to earn experience.", "battle")
+    
+    def addTask(self, title, description, task_type):
+        # Calculate vertical position based on number of existing tasks
+        num_tasks = len(self.task_data)
+        task_z = 2.0 - (num_tasks * 0.8)
+        
+        task_frame = DirectFrame(parent=self.taskList.getCanvas(), 
+                                 frameColor=(0.2, 0.2, 0.2, 0.7),
+                                 scale=1.0,
+                                 frameSize=(-2.3, 2.3, -0.5, 0.5),
+                                 pos=(0, 0, task_z))
+        
+        task_info = {
+            'title': title,
+            'description': description,
+            'type': task_type,
+            'status': 'incomplete',  # incomplete, in_progress, completed
+            'progress': 0,
+            'target': 1,
+            'frame': task_frame
+        }
+        
+        self.task_data.append(task_info)
+        
+        # Initialize in base.taskProgress if not exists
+        if task_type not in base.taskProgress:
+            base.taskProgress[task_type] = {'status': 'incomplete', 'progress': 0, 'target': 1}
+        
+        self.updateTaskDisplay(task_info)
+    
+    def updateTaskDisplay(self, task_info):
+        # Clear old label if exists
+        if hasattr(task_info['frame'], 'task_label'):
+            task_info['frame'].task_label.destroy()
+        
+        # Color based on status
+        status_colors = {
+            'incomplete': (1, 1, 1, 1),  # White
+            'in_progress': (1, 1, 0, 1),  # Yellow
+            'completed': (0, 1, 0, 1)    # Green
+        }
+        
+        status_text = f"[{task_info['status'].upper()}] "
+        
+        task_label = DirectLabel(parent=task_info['frame'], 
+                                  text=f"{status_text}{task_info['title']}\n{task_info['description']}",
+                                  scale=0.18, pos=(-2.3, 0, 0),
+                                  text_fg=status_colors.get(task_info['status'], (1, 1, 1, 1)),
+                                  frameColor=(0, 0, 0, 0),
+                                  text_align=TextNode.ALeft)
+        task_info['frame'].task_label = task_label
+    
+    def updateTaskProgress(self, task_type, progress_delta=1):
+        """Update progress for a specific task type"""
+        if task_type not in base.taskProgress:
+            return
+        
+        task_prog = base.taskProgress[task_type]
+        task_prog['progress'] += progress_delta
+        
+        # Check if task is complete
+        if task_prog['progress'] >= task_prog['target']:
+            task_prog['status'] = 'completed'
+        
+        # Update display for all tasks of this type
+        for task_info in self.task_data:
+            if task_info['type'] == task_type:
+                task_info['status'] = task_prog['status']
+                task_info['progress'] = task_prog['progress']
+                self.updateTaskDisplay(task_info)
+    
+    def completeTask(self, task_type):
+        """Mark a task as complete"""
+        if task_type in base.taskProgress:
+            base.taskProgress[task_type]['status'] = 'completed'
+            base.taskProgress[task_type]['progress'] = base.taskProgress[task_type]['target']
+            
+            # Update display
+            for task_info in self.task_data:
+                if task_info['type'] == task_type:
+                    task_info['status'] = 'completed'
+                    task_info['progress'] = task_info['target']
+                    self.updateTaskDisplay(task_info)
+    
+    def toggle(self):
+        if self.isHidden():
+            self.show()
+        else:
+            self.hide()
+
 base = ShowBase()
 base.disableMouse()
 
@@ -119,12 +237,12 @@ class LoadingZoneManager:
         self.zones = []
         base.taskMgr.add(self.update, "loadingZoneManagerUpdate")
 
-    def addZone(self, x1, y1, x2, y2, zoneId):
+    def addZone(self, x1, y1, x2, y2, zoneId, entryPos=None):
         minX = min(x1, x2)
         maxX = max(x1, x2)
         minY = min(y1, y2)
         maxY = max(y1, y2)
-        self.zones.append((minX, minY, maxX, maxY, zoneId))
+        self.zones.append((minX, minY, maxX, maxY, zoneId, entryPos))
 
     def clear(self):
         self.zones = []
@@ -132,18 +250,26 @@ class LoadingZoneManager:
     def update(self, task):
         if localAvatar:
             x, y = localAvatar.getX(), localAvatar.getY()
+            
+            # Debug logging - only log occasionally to avoid spam
+            import time
+            if int(time.time() * 2) % 5 == 0:  # Log every ~2.5 seconds
+                print(f"[LoadingZone] Avatar at ({x:.1f}, {y:.1f}), {len(self.zones)} zones loaded")
+            
             for z in list(self.zones):
-                minX, minY, maxX, maxY, zoneId = z
+                minX, minY, maxX, maxY, zoneId, entryPos = z
                 if minX <= x <= maxX and minY <= y <= maxY:
+                    print(f"[LoadingZone] Triggered zone {zoneId} at ({x:.1f}, {y:.1f})")
+                    print(f"[LoadingZone] Zone bounds: ({minX:.1f}, {minY:.1f}) to ({maxX:.1f}, {maxY:.1f})")
                     self.clear()
-                    loadZone(zoneId)
+                    loadZone(zoneId, entryPos)
                     break
         return Task.cont
 
 loadingZoneMgr = LoadingZoneManager()
 G["loadingZoneMgr"] = loadingZoneMgr
 
-def loadZone(zoneId):
+def loadZone(zoneId, entryPos=None):
     global breakAllChecks, zID
     breakAllChecks = True
     
@@ -183,8 +309,18 @@ def loadZone(zoneId):
     base.zID = zID
     G["pZID"] = old_zID
     
+    # Store entry position for the zone to use
+    if entryPos is not None:
+        base.entryPos = entryPos
+    
     try:
         execfile(f"{zID}.py")
+        
+        # Set player position to entry point if specified
+        # Note: Zone scripts handle their own position setting, so we only override if entryPos is provided
+        if localAvatar and entryPos is not None:
+            localAvatar.setPos(*entryPos)
+        
         spawnIceCreams()
     except Exception as e:
         print(f"Error loading zone {zID}: {e}")
@@ -232,6 +368,9 @@ def iceCreamTask(task):
                 localAvatar.hp = min(localAvatar.maxHp, localAvatar.hp + random.randint(1, 6))
                 if hasattr(base, "laffMeter"):
                     base.laffMeter.updateLaff()
+                # Update ice cream collection task progress
+                if hasattr(base, 'tasksHUD'):
+                    base.tasksHUD.updateTaskProgress('ice_cream', 1)
     return Task.cont
 
 class LaffMeter(DirectFrame):
@@ -333,8 +472,8 @@ class LaffMeter(DirectFrame):
 
 class LoadingZone:
     @staticmethod
-    def define(x1, y1, x2, y2, zoneId):
-        loadingZoneMgr.addZone(x1, y1, x2, y2, zoneId)
+    def define(x1, y1, x2, y2, zoneId, entryPos=None):
+        loadingZoneMgr.addZone(x1, y1, x2, y2, zoneId, entryPos)
 
 G["LoadingZone"] = LoadingZone
 
@@ -517,11 +656,20 @@ def start_game(toon_index):
     from cog import CogManager
     base.cogMgr = CogManager()
     
+    # Initialize Tasks HUD
+    base.tasksHUD = TasksHUD()
+    
+    # Add "end" key listener to toggle Tasks HUD
+    def toggleTasksHUD():
+        if hasattr(base, 'tasksHUD'):
+            base.tasksHUD.toggle()
+    
+    base.accept('end', toggleTasksHUD)
+    
     loadZone(1)
     onScreenDebug.enabled = True
     base.taskMgr.add(handleMovement, 'controlManager')
     base.taskMgr.add(updateOnScreenDebug, 'UpdateOSD')
-    DirectButton(text=("Back to previous safezone", "Click", "...", "disabled"), scale=.08, pos=(0, -.5, .5), command=lambda: loadZone(1))
 
 def battleTriggerTask(task):
     if not localAvatar or localAvatar.hp <= 0 or not hasattr(base, "cogMgr") or not hasattr(base, "battleMgr"):
@@ -543,6 +691,7 @@ def updateOnScreenDebug(task):
         onScreenDebug.add('Avatar Position', localAvatar.getPos())
         onScreenDebug.add('Avatar Angle', localAvatar.getHpr())
         onScreenDebug.add('Zone', zones[zID])
+        DirectButton(text=("Back to previous safezone", "Click", "...", "disabled"), scale=.08, pos=(0, -.5, .5), command=lambda: loadZone(1))
     return Task.cont
 
 PickAToonMenu(start_game)

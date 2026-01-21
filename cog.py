@@ -4,6 +4,7 @@ from direct.task import Task
 from direct.gui.DirectGui import *
 import random
 from thirdparty.nametag.toonNametag import createNametag
+import math
 
 suitTypes = {
     'A': 'phase_3.5/models/char/suitA-mod.bam',
@@ -18,12 +19,19 @@ suitAnims = {
 # Note: For simplicity using A anims for all for now, or I'd need to map them all.
 
 class Cog:
-    def __init__(self, type='A', head=None, name="Cog", level=1, cogId=0):
+    def __init__(self, type='A', head=None, name="Cog", level=1, cogId=0, zoneBounds=None):
         self.type = type
         self.level = level
         self.cogId = cogId
         self.maxHp = (level + 1) * (level + 2)
         self.hp = self.maxHp
+        
+        # Zone boundaries to keep Cog in bounds (minX, maxX, minY, maxY)
+        # If not provided, use reasonable default bounds
+        if zoneBounds:
+            self.zoneBounds = zoneBounds
+        else:
+            self.zoneBounds = (-500, 500, -500, 500)
         
         # Determine correct animation paths based on type
         # Suit A and B are usually in phase_4, C is in phase_3.5
@@ -161,6 +169,21 @@ class Cog:
         
     def setH(self, h):
         self.node.setH(h)
+    
+    def enforceBounds(self):
+        """Ensure Cog stays within zone boundaries"""
+        if not hasattr(self, 'zoneBounds'):
+            return
+            
+        x, y, z = self.node.getPos()
+        minX, maxX, minY, maxY = self.zoneBounds
+        
+        # Clamp position to stay within bounds
+        newX = max(minX, min(maxX, x))
+        newY = max(minY, min(maxY, y))
+        
+        if newX != x or newY != y:
+            self.node.setPos(newX, newY, z)
 
     def cleanup(self):
         self.node.cleanup()
@@ -190,6 +213,8 @@ class CogManager:
             cog = self.cogs[cogId]
             if not cog.inBattle:
                 cog.setPos(*pos)
+                # Enforce boundaries to keep Cog in play area
+                cog.enforceBounds()
                 cog.setH(h)
                 if cog.node.getCurrentAnim() != anim:
                     cog.node.loop(anim)

@@ -7,15 +7,19 @@ currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 base.localAvatar.setPos(0,0,0)
 
 LoadingZone = G["LoadingZone"]
-# Loopy Lane (To TTC) (Calculated Sign/Tunnel approx)
-LoadingZone.define(30.79, 63.75, 40.79, 73.75, 11)
+# Loopy Lane (To TTC) - Tunnel at (80, 169.99, -0.17) facing 180 HPR
+# Zone placed in front of tunnel (extending toward -Y)
+LoadingZone.define(65, 155, 95, 185, 11)
 
-# Tenor Terrace (4340 -> 15)
-LoadingZone.define(-30, -199.95, -20, -189.95, 15)
-# Alto Avenue (4127 -> 16)
-LoadingZone.define(75, 169.99, 85, 179.99, 16)
-# Baritone Boulevard (4222 -> 17)
-LoadingZone.define(-160.012, 39.58, -150.012, 49.58, 17)
+# Tenor Terrace (4340 -> 15) - Tunnel at (-25, -209.95, -0.17) facing 0 HPR
+# Zone placed in front of tunnel (extending toward -Y)
+LoadingZone.define(-40, -220, -10, -200, 15)
+# Alto Avenue (4127 -> 16) - Tunnel at (80, 169.99, -0.17) facing 180 HPR
+# Zone placed in front of tunnel (extending toward -Y)
+LoadingZone.define(65, 155, 95, 185, 16)
+# Baritone Boulevard (4222 -> 17) - Tunnel at (-170.012, 44.58, -0.5) facing -90 HPR
+# Zone placed in front of tunnel (extending toward +Y)
+LoadingZone.define(-180, 34, -160, 54, 17)
 
 global isCurrentZone
 isCurrentZone = True

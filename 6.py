@@ -6,8 +6,20 @@ from math import pi, sin, cos
 from direct.showbase.ShowBase import ShowBase
 from direct.interval.IntervalGlobal import Sequence
 import threading
+import random
 
-currentLand.currentLandModels[zones[zID]] = loader.loadModel("phase_4/models/minigames/maze_4player.bam")
+# Randomly select a trolley game
+game_models = [
+    ("phase_4/models/minigames/maze_4player.bam", "Maze Game"),
+    ("phase_4/models/minigames/cogthief_game.bam", "Cog Thief Game"),
+    ("phase_4/models/minigames/diving_game.bam", "Diving Game"),
+    ("phase_4/models/minigames/race.bam", "Race Game")
+]
+selected_game, game_name = random.choice(game_models)
+
+print(f"Loading Trolley Game: {game_name}")
+
+currentLand.currentLandModels[zones[zID]] = loader.loadModel(selected_game)
 currentLand.currentLandModels[zones[zID]].reparentTo(render)
 currentLand.currentLandModels[zones[zID]].setHpr(180,0,0)
 currentLand.currentLandModels[zones[zID]].setPos(0,0,0)

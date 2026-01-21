@@ -131,6 +131,10 @@ class DNALoader:
     def handleFlatBuilding(self, xml_node, parent):
         building = parent.attachNewNode("flat_building")
         width = float(xml_node.get('width', 10))
+        
+        # Add collision to flat buildings
+        building.setCollideMask(BitMask32(1))
+        
         self.parseNode(xml_node, building)
 
     def handleWall(self, xml_node, parent):
@@ -158,17 +162,25 @@ class DNALoader:
                 new_np.setSx(width)
                 new_np.setSy(width)
                 new_np.setSz(height)
+                
+                # Add collision to walls so players and cogs can't pass through
+                new_np.setCollideMask(BitMask32(1))
+                
                 self.parseNode(xml_node, new_np)
             except Exception as e:
                 print(f"Failed to load wall model {model_path} for code {code}: {e}")
         else:
             dummy = parent.attachNewNode("wall")
+            # Add collision to placeholder walls too
+            dummy.setCollideMask(BitMask32(1))
             self.parseNode(xml_node, dummy)
 
     def handleSign(self, xml_node, parent):
         sign_node = parent.find("**/sign_origin")
         if sign_node.isEmpty():
             sign_node = parent.attachNewNode("sign")
+            # Set a default Z position if no sign_origin exists to prevent underground signs
+            sign_node.setZ(5.0)
 
         code = xml_node.get('code')
         if code and code in self.storage:
@@ -204,13 +216,35 @@ class DNALoader:
             tn.setText(text_node.text)
 
             try:
-                font_path = 'phase_3/fonts/ImpressBT.ttf'
+                # Try to get font from DNA attributes, otherwise use default
+                font_code = xml_node.get('font', None)
+                
+                # Font mapping for different zones/contexts
+                font_map = {
+                    'mickey': 'phase_3/fonts/MickeyFont.ttf',
+                    'minnie': 'phase_3/fonts/MinnieFont.ttf',
+                    'mickey_classic': 'phase_3/fonts/MickeyFontMaximum.bam',
+                    'default': 'phase_3/fonts/ImpressBT.ttf'
+                }
+                
+                # Determine font path
+                if font_code and font_code.lower() in font_map:
+                    font_path = font_map[font_code.lower()]
+                else:
+                    # Use ImpressBT as default fallback
+                    font_path = font_map['default']
+                
                 if os.path.exists(font_path):
                     font = loader.loadFont(font_path)
                     if font:
                         tn.setFont(font)
                 else:
-                    print(f"Font file not found at {font_path}")
+                    print(f"Font file not found at {font_path}, trying default")
+                    default_font = font_map['default']
+                    if os.path.exists(default_font):
+                        font = loader.loadFont(default_font)
+                        if font:
+                            tn.setFont(font)
             except Exception as e:
                 print(f"Error loading font: {e}")
 

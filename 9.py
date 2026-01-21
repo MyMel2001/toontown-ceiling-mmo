@@ -7,12 +7,15 @@ base.localAvatar.setPos(0, 0, 0)
 
 G = get_builtins()
 LoadingZone = G["LoadingZone"]
-# Walrus Way (3126 -> 23)
-LoadingZone.define(150.26, -80.77, 160.26, -70.77, 23)
-# Sleet Street (3233 -> 24)
-LoadingZone.define(-22.77, -253.67, -12.77, -243.67, 24)
-# Polar Place (3301 -> 25)
-LoadingZone.define(100.11, 142.01, 110.11, 152.01, 25)
+# Walrus Way (3126 -> 23) - Tunnel at (160.26, -80.77, -0.62) facing 90 HPR
+# Zone placed in front of tunnel (extending toward -Y)
+LoadingZone.define(150, -90, 170, -70, 23)
+# Sleet Street (3233 -> 24) - Tunnel at (-22.77, -253.67, -0.85) facing 23 HPR
+# Zone placed in front of tunnel (extending toward -X and -Y)
+LoadingZone.define(-12, -245, -33, -262, 24)
+# Polar Place (3301 -> 25) - Tunnel at (100.11, 152.01, -0.54) facing 150 HPR
+# Zone placed in front of tunnel (extending toward +X and -Y)
+LoadingZone.define(115, 145, 90, 170, 25)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/TB_nbrhood.ogg')
