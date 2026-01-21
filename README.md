@@ -27,13 +27,7 @@ A Toontown Private Server made of mostly freely available components. Code is mo
 
 ## Future features...
 
-* Add Random Trolley games(?)
-
-## Known Major Issues.
-
-* ***DNA Loader*** Fonts in Playground/Street/CogHQ DNA are set to a placeholder font instead of the corresponding fonts. (All fonts are in phase_3/fonts)
-* ***DNA Loader*** DNA loading is a bit nutzo-buttso. (Flat walls not colliding, and some signs underground.)
-* ***Loading Zones*** Loading zone positions are WAY off in most areas besides Toontown Central's playground and streets. They should be right in front of the tunnels, not behind/around them.
+Check [plan.md](plan.md)!
 
 ## License
 MIT (Modified)
