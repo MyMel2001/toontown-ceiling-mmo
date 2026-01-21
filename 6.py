@@ -11,9 +11,8 @@ import random
 # Randomly select a trolley game
 game_models = [
     ("phase_4/models/minigames/maze_4player.bam", "Maze Game"),
-    ("phase_4/models/minigames/cogthief_game.bam", "Cog Thief Game"),
-    ("phase_4/models/minigames/diving_game.bam", "Diving Game"),
-    ("phase_4/models/minigames/race.bam", "Race Game")
+    ("phase_4/models/minigames/cogthief_game.bam", "Cog Game"),
+    ("phase_4/models/minigames/tag_game.bam", "Tag Game")
 ]
 selected_game, game_name = random.choice(game_models)
 

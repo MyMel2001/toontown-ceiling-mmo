@@ -121,6 +121,9 @@ class Battle(FSM):
     def checkBattleEnd(self):
         if self.cog.hp <= 0:
             print(f"{self.cog.name} defeated!")
+            # Update battle task progress
+            if hasattr(base, 'tasksHUD'):
+                base.tasksHUD.updateTaskProgress('battle', 1)
             self.cog.node.play("Walk") # Replace with death animation if available, Walk for now
             Sequence(
                 Wait(1.0),

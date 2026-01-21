@@ -31,7 +31,7 @@ def loadRandomTrolleyGame():
     import random
     game_models = [
         ("phase_4/models/minigames/maze_4player.bam", "Maze Game"),
-        ("phase_4/models/minigames/cog_game.bam", "Cog Game"),
+        ("phase_4/models/minigames/cogthief_game.bam", "Cog Game"),
         ("phase_4/models/minigames/tag_game.bam", "Tag Game")
     ]
     selected = random.choice(game_models)

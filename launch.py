@@ -45,11 +45,12 @@ class TasksHUD(DirectFrame):
             base.taskProgress = {}
         
         # Sample tasks
-        self.addTask("Welcome to Toontown!", "Explore Toontown Central and have fun!", "explore")
-        self.addTask("Find the Trolley", "Locate the trolley station in TTC.", "trolley")
-        self.addTask("Battle a Cog", "Engage a Cog in battle to earn experience.", "battle")
+        self.addTask("Welcome to Toontown!", "Explore Toontown Central and have fun!", "explore", target=1)
+        self.addTask("Find the Trolley", "Locate the trolley station in TTC.", "trolley", target=1)
+        self.addTask("Battle a Cog", "Engage a Cog in battle to earn experience.", "battle", target=1)
+        self.addTask("Collect Ice Cream", "Pick up ice cream cones scattered around.", "ice_cream", target=5)
     
-    def addTask(self, title, description, task_type):
+    def addTask(self, title, description, task_type, target=1):
         # Calculate vertical position based on number of existing tasks
         num_tasks = len(self.task_data)
         task_z = 2.0 - (num_tasks * 0.8)
@@ -66,7 +67,7 @@ class TasksHUD(DirectFrame):
             'type': task_type,
             'status': 'incomplete',  # incomplete, in_progress, completed
             'progress': 0,
-            'target': 1,
+            'target': target,
             'frame': task_frame
         }
         
@@ -74,7 +75,7 @@ class TasksHUD(DirectFrame):
         
         # Initialize in base.taskProgress if not exists
         if task_type not in base.taskProgress:
-            base.taskProgress[task_type] = {'status': 'incomplete', 'progress': 0, 'target': 1}
+            base.taskProgress[task_type] = {'status': 'incomplete', 'progress': 0, 'target': target}
         
         self.updateTaskDisplay(task_info)
     
@@ -92,8 +93,13 @@ class TasksHUD(DirectFrame):
         
         status_text = f"[{task_info['status'].upper()}] "
         
+        # Add progress counter if applicable
+        progress_text = ""
+        if task_info['target'] > 1 and task_info['progress'] > 0:
+            progress_text = f" ({task_info['progress']}/{task_info['target']})"
+        
         task_label = DirectLabel(parent=task_info['frame'], 
-                                  text=f"{status_text}{task_info['title']}\n{task_info['description']}",
+                                  text=f"{status_text}{task_info['title']}{progress_text}\n{task_info['description']}",
                                   scale=0.18, pos=(-2.3, 0, 0),
                                   text_fg=status_colors.get(task_info['status'], (1, 1, 1, 1)),
                                   frameColor=(0, 0, 0, 0),
@@ -111,6 +117,8 @@ class TasksHUD(DirectFrame):
         # Check if task is complete
         if task_prog['progress'] >= task_prog['target']:
             task_prog['status'] = 'completed'
+        else:
+            task_prog['status'] = 'in_progress'
         
         # Update display for all tasks of this type
         for task_info in self.task_data:
@@ -320,6 +328,13 @@ def loadZone(zoneId, entryPos=None):
         # Note: Zone scripts handle their own position setting, so we only override if entryPos is provided
         if localAvatar and entryPos is not None:
             localAvatar.setPos(*entryPos)
+        
+        # Trigger zone-based task progress
+        if hasattr(base, 'tasksHUD'):
+            if zoneId == 1:  # Toontown Central
+                base.tasksHUD.updateTaskProgress('explore', 1)
+            elif zoneId == 6:  # Trolley Game
+                base.tasksHUD.updateTaskProgress('trolley', 1)
         
         spawnIceCreams()
     except Exception as e:
