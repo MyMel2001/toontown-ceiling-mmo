@@ -4,7 +4,7 @@ Fix/add these in order of importance for game design and a good game overall.
 
 ## Future features...
 
-* Add real Trolley games.
+* Make Trolley games really function.
 
 ## Known Major Issues.
 
