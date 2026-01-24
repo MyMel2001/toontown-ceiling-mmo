@@ -1,0 +1,13 @@
+{
+  "active": true,
+  "iteration": 1,
+  "minIterations": 1,
+  "maxIterations": 0,
+  "completionPromise": "COMPLETE",
+  "tasksMode": false,
+  "taskPromise": "READY_FOR_NEXT_TASK",
+  "prompt": "\n\n@plan.md @activity.md\n\nFirst read activity.md to see what was recently accomplished.\n\nOpen plan.md and choose the single highest priority task where passes is false.\n\nWork on exactly ONE task: implement the change.\n\nAfter implementing, check your work by running the script for 60 seconds, quitting, and checking for errors.\n\nIf it's a web project, use Playwright to test the service as a user would.\n\nAppend a dated progress entry to activity.md describing what you changed.\n\nUpdate that task's passes in plan.md from false to true.\n\nMake one git commit for that task only with a clear message.\n\nDo not git init, do not change remotes, do not push.\n\nONLY WORK ON A SINGLE TASK AT A TIME.\n\nWhen ALL tasks have passes true, output <promise>COMPLETE</promise>",
+  "startedAt": "2026-01-24T21:44:11.271Z",
+  "model": "qwen3-vl:8b",
+  "agent": "claude-code"
+}
