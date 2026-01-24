@@ -27,11 +27,11 @@ class Cog:
         self.hp = self.maxHp
         
         # Zone boundaries to keep Cog in bounds (minX, maxX, minY, maxY)
-        # If not provided, use reasonable default bounds
+        # If not provided, use reasonable default bounds for a playground
         if zoneBounds:
             self.zoneBounds = zoneBounds
         else:
-            self.zoneBounds = (-500, 500, -500, 500)
+            self.zoneBounds = (-100, 100, -100, 100)  # More reasonable playground bounds
         
         # Determine correct animation paths based on type
         # Suit A and B are usually in phase_4, C is in phase_3.5
@@ -192,13 +192,21 @@ class Cog:
 class CogManager:
     def __init__(self):
         self.cogs = {} # cogId: Cog object
-        # Client CogManager no longer handles movement, server does
+        self.currentZoneBounds = (-100, 100, -100, 100)  # Default playground bounds
         
-    def spawnCog(self, type='A', head=None, pos=(0,0,0), name="Cog", level=1, cogId=0):
+    def setZoneBounds(self, minX, maxX, minY, maxY):
+        """Set the boundary box for the current zone. All new cogs will use these bounds."""
+        self.currentZoneBounds = (minX, maxX, minY, maxY)
+        
+    def spawnCog(self, type='A', head=None, pos=(0,0,0), name="Cog", level=1, cogId=0, zoneBounds=None):
         if cogId in self.cogs:
             self.cogs[cogId].cleanup()
             
-        cog = Cog(type, head, name=name, level=level, cogId=cogId)
+        # Use provided bounds or fall back to current zone bounds
+        if zoneBounds is None:
+            zoneBounds = self.currentZoneBounds
+            
+        cog = Cog(type, head, name=name, level=level, cogId=cogId, zoneBounds=zoneBounds)
         cog.setPos(*pos)
         self.cogs[cogId] = cog
         return cog

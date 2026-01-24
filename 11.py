@@ -9,7 +9,6 @@ currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 
 # Setup tunnel collision to go back to TTC
-# Move character further out of the tunnel trigger zone
 base.localAvatar.setPos(0, 20, 0)
 
 # Tunnels in Loopy Lane

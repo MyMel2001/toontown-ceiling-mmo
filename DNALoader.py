@@ -209,6 +209,13 @@ class DNALoader:
 
     def handleBaseline(self, xml_node, parent):
         baseline_node = parent.attachNewNode("baseline")
+        
+        # Set depth write and test to prevent z-fighting with signs
+        baseline_node.setDepthWrite(True)
+        baseline_node.setDepthTest(True)
+        
+        # Put text in a later cull bin to ensure it renders in front of signs
+        baseline_node.setBin('fixed', 45)  # Higher than default (0) and shadow (40)
 
         text_node = xml_node.find('text')
         if text_node is not None and text_node.text:
@@ -249,7 +256,9 @@ class DNALoader:
                 print(f"Error loading font: {e}")
 
             np = baseline_node.attachNewNode(tn)
-            np.setPos(np, -1, -1, 0)
+            # Adjust position to render in front of signs
+            # Move Y position positive to bring text closer to camera
+            np.setPos(np, -1, -0.1, 0)  # Changed from -1 to -0.1 for depth
             np.setScale(.69)
 
         self.parseNode(xml_node, baseline_node)

@@ -245,12 +245,12 @@ class LoadingZoneManager:
         self.zones = []
         base.taskMgr.add(self.update, "loadingZoneManagerUpdate")
 
-    def addZone(self, x1, y1, x2, y2, zoneId, entryPos=None):
+    def addZone(self, x1, y1, x2, y2, zoneId, entryPos=None, entryHpr=None):
         minX = min(x1, x2)
         maxX = max(x1, x2)
         minY = min(y1, y2)
         maxY = max(y1, y2)
-        self.zones.append((minX, minY, maxX, maxY, zoneId, entryPos))
+        self.zones.append((minX, minY, maxX, maxY, zoneId, entryPos, entryHpr))
 
     def clear(self):
         self.zones = []
@@ -265,19 +265,19 @@ class LoadingZoneManager:
                 print(f"[LoadingZone] Avatar at ({x:.1f}, {y:.1f}), {len(self.zones)} zones loaded")
             
             for z in list(self.zones):
-                minX, minY, maxX, maxY, zoneId, entryPos = z
+                minX, minY, maxX, maxY, zoneId, entryPos, entryHpr = z
                 if minX <= x <= maxX and minY <= y <= maxY:
                     print(f"[LoadingZone] Triggered zone {zoneId} at ({x:.1f}, {y:.1f})")
                     print(f"[LoadingZone] Zone bounds: ({minX:.1f}, {minY:.1f}) to ({maxX:.1f}, {maxY:.1f})")
                     self.clear()
-                    loadZone(zoneId, entryPos)
+                    loadZone(zoneId, entryPos, entryHpr)
                     break
         return Task.cont
 
 loadingZoneMgr = LoadingZoneManager()
 G["loadingZoneMgr"] = loadingZoneMgr
 
-def loadZone(zoneId, entryPos=None):
+def loadZone(zoneId, entryPos=None, entryHpr=None):
     global breakAllChecks, zID
     breakAllChecks = True
     
@@ -317,17 +317,26 @@ def loadZone(zoneId, entryPos=None):
     base.zID = zID
     G["pZID"] = old_zID
     
-    # Store entry position for the zone to use
+    # Store entry position and heading for the zone to use
     if entryPos is not None:
         base.entryPos = entryPos
+    else:
+        base.entryPos = None
+    if entryHpr is not None:
+        base.entryHpr = entryHpr
+    else:
+        base.entryHpr = None
     
     try:
         execfile(f"{zID}.py")
         
-        # Set player position to entry point if specified
-        # Note: Zone scripts handle their own position setting, so we only override if entryPos is provided
-        if localAvatar and entryPos is not None:
-            localAvatar.setPos(*entryPos)
+        # Set player position and heading to entry point if specified
+        # This provides contextual positioning based on which tunnel was used
+        if localAvatar:
+            if entryPos is not None:
+                localAvatar.setPos(*entryPos)
+            if entryHpr is not None:
+                localAvatar.setHpr(*entryHpr)
         
         # Trigger zone-based task progress
         if hasattr(base, 'tasksHUD'):
@@ -487,8 +496,8 @@ class LaffMeter(DirectFrame):
 
 class LoadingZone:
     @staticmethod
-    def define(x1, y1, x2, y2, zoneId, entryPos=None):
-        loadingZoneMgr.addZone(x1, y1, x2, y2, zoneId, entryPos)
+    def define(x1, y1, x2, y2, zoneId, entryPos=None, entryHpr=None):
+        loadingZoneMgr.addZone(x1, y1, x2, y2, zoneId, entryPos, entryHpr)
 
 G["LoadingZone"] = LoadingZone
 
