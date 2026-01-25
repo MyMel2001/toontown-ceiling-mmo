@@ -574,6 +574,102 @@ setWatchKey('arrow_left', 'turnLeft', 'left')
 setWatchKey('arrow_right', 'turnRight', 'right')
 setWatchKey('control', 'jump', 'control')
 
+# Quest system
+class QuestManager:
+    def __init__(self):
+        self.activeQuests = []  # List of active quest dictionaries
+        self.completedQuests = []
+        self.questNPCs = []  # List of (npc_name, quest_giver_function) tuples
+        
+    def addQuestNPC(self, npc_name, quest_func):
+        """Register an NPC as a quest giver"""
+        self.questNPCs.append((npc_name, quest_func))
+        
+    def interactWithNPC(self, npc_name):
+        """Called when player presses 'q' near an NPC"""
+        for name, quest_func in self.questNPCs:
+            if name == npc_name:
+                quest_func()
+                return True
+        return False
+        
+    def addQuest(self, title, description, objective_type, target, reward):
+        """Add a new quest to active quests"""
+        quest = {
+            'title': title,
+            'description': description,
+            'objective_type': objective_type,  # 'battle', 'explore', etc.
+            'target': target,
+            'progress': 0,
+            'reward': reward
+        }
+        self.activeQuests.append(quest)
+        print(f"[Quest] New quest: {title} - {description}")
+        return quest
+        
+    def completeQuest(self, quest_index):
+        """Complete a quest by index"""
+        if 0 <= quest_index < len(self.activeQuests):
+            quest = self.activeQuests.pop(quest_index)
+            self.completedQuests.append(quest)
+            print(f"[Quest] Completed: {quest['title']} - Reward: {quest['reward']}")
+            return quest
+        return None
+        
+    def updateQuestProgress(self, objective_type, progress_delta=1):
+        """Update progress for all quests matching objective_type"""
+        for quest in self.activeQuests:
+            if quest['objective_type'] == objective_type:
+                quest['progress'] += progress_delta
+                if quest['progress'] >= quest['target']:
+                    # Mark quest as ready to turn in
+                    quest['ready'] = True
+                    print(f"[Quest] Quest ready to turn in: {quest['title']}")
+                return True
+        return False
+
+base.questManager = QuestManager()
+
+# Global list to track all NPCs with their positions and names
+base.npcs = []
+
+# Quest interaction system
+def handleQuestInteraction():
+    """Called when player presses 'q' key"""
+    if not localAvatar:
+        return
+    
+    player_pos = localAvatar.getPos()
+    
+    # Find the nearest NPC within interaction range
+    nearest_npc = None
+    nearest_distance = 10.0  # Interaction range
+    
+    for npc_info in base.npcs:
+        npc_name = npc_info['name']
+        npc_pos = npc_info['pos']
+        npc_node = npc_info['node']
+        
+        if npc_node.isEmpty():
+            continue
+            
+        distance = (player_pos - npc_pos).length()
+        if distance < nearest_distance:
+            nearest_distance = distance
+            nearest_npc = npc_info
+    
+    if nearest_npc:
+        npc_name = nearest_npc['name']
+        print(f"[Quest] Interacting with NPC: {npc_name}")
+        # Try to interact with quest manager
+        if not base.questManager.interactWithNPC(npc_name):
+            print(f"[Quest] NPC {npc_name} has no quest available")
+    else:
+        print("[Quest] No NPC in range")
+
+# Add 'q' key handler for quest interactions
+base.accept('q', handleQuestInteraction)
+
 movingNeutral, movingForward = False, False
 movingRotation, movingBackward = False, False
 movingJumping = False

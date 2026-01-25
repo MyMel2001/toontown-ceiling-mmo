@@ -216,6 +216,9 @@ class DNALoader:
         
         # Put text in a later cull bin to ensure it renders in front of signs
         baseline_node.setBin('fixed', 45)  # Higher than default (0) and shadow (40)
+        
+        # Enable transparency for text to handle anti-aliasing properly
+        baseline_node.setTransparency(TransparencyAttrib.MAlpha)
 
         text_node = xml_node.find('text')
         if text_node is not None and text_node.text:
@@ -256,9 +259,9 @@ class DNALoader:
                 print(f"Error loading font: {e}")
 
             np = baseline_node.attachNewNode(tn)
-            # Adjust position to render in front of signs
-            # Move Y position positive to bring text closer to camera
-            np.setPos(np, -1, -0.1, 0)  # Changed from -1 to -0.1 for depth
+            # Adjust position to render properly in front of signs
+            # Negative Y moves it closer to camera, slightly offset to prevent z-fighting
+            np.setPos(np, -1, -0.15, 0)  # Adjusted depth for better text rendering
             np.setScale(.69)
 
         self.parseNode(xml_node, baseline_node)

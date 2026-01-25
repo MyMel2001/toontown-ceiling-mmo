@@ -6,6 +6,10 @@ currentLand.currentLandModels[zones[zID]].reparentTo(render)
 currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 base.localAvatar.setPos(0,0,0)
 
+# Set zone bounds for Cog collisions (based on MML playground size)
+if hasattr(base, 'cogMgr'):
+    base.cogMgr.setZoneBounds(-80, 80, -100, 100)
+
 LoadingZone = G["LoadingZone"]
 # Loopy Lane (To TTC) - Tunnel at (80, 169.99, -0.17) facing 180 HPR
 # Zone placed in front of tunnel (extending toward -Y)
