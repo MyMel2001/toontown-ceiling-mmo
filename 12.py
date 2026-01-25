@@ -13,10 +13,10 @@ base.localAvatar.setPos(0, 20, 0)
 
 # Tunnels in Punchline Place
 LoadingZone = G["LoadingZone"]
-# Back to TTC Playground
-LoadingZone.define(-80, 110, -70, 120, 1)
+# Back to TTC Playground - Tunnel at (0, 0, 0) facing 180
+LoadingZone.define(-10, -10, 10, 10, 1, entryPos=(-45, 106, 0.025), entryHpr=(0, 0, 0))
 # Forward to Minnie's Melody Land (end of street)
-LoadingZone.define(-585, -35, -575, -25, 0)
+LoadingZone.define(-585, -35, -575, -25, 0, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
 
 # Setup tunnel at end of street to Donald's Docks
 # G["loadStreet"]('phase_6/dna/donalds_dock_sz.xml', pos=(0, 600, 0), zone_key="next_sz")

@@ -22,8 +22,9 @@ LoadingZone.define(-114, 287, -104, 297, 21, entryPos=(-104, 292, 0.025), entryH
 # Zone placed 5 units in front of tunnel entrance
 LoadingZone.define(-65, -99, -55, -89, 22, entryPos=(-55, -94, 0.025), entryHpr=(180, 0, 0))
 
-# To Sellbot HQ (zone 5)
-LoadingZone.define(-20, -20, 20, 20, 5, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+# To Sellbot HQ (zone 5) - Tunnel at (10, -236, 0.025) facing 180
+# Zone placed 5 units in front of tunnel entrance
+LoadingZone.define(5, -241, 15, -231, 5, entryPos=(10, -246, 0.025), entryHpr=(180, 0, 0))
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GARDEN_nbrhood.ogg')

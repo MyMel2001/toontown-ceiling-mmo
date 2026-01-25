@@ -178,9 +178,13 @@ class DNALoader:
     def handleSign(self, xml_node, parent):
         sign_node = parent.find("**/sign_origin")
         if sign_node.isEmpty():
-            sign_node = parent.attachNewNode("sign")
-            # Set a default Z position if no sign_origin exists to prevent underground signs
-            sign_node.setZ(5.0)
+            # If no sign_origin, try to find generic sign node or attach to parent
+            sign_node = parent.find("**/sign")
+            if sign_node.isEmpty():
+                sign_node = parent.attachNewNode("sign")
+                # Set a default position if no sign_origin exists to prevent underground signs
+                # Using a higher Z and slightly forward Y to be visible on generic buildings
+                sign_node.setPos(0, -0.1, 10.0)
 
         code = xml_node.get('code')
         if code and code in self.storage:
@@ -234,14 +238,43 @@ class DNALoader:
                     'mickey': 'phase_3/fonts/MickeyFont.ttf',
                     'minnie': 'phase_3/fonts/MinnieFont.ttf',
                     'mickey_classic': 'phase_3/fonts/MickeyFontMaximum.bam',
+                    'mickey_maximum': 'phase_3/fonts/MickeyFontMaximum.bam',
+                    'mickey_standard': 'phase_3/fonts/MickeyFontStandard.bam',
+                    'comic': 'phase_3/fonts/Comic.ttf',
+                    'humanist': 'phase_3/fonts/Humanist.ttf',
+                    'jiggery': 'phase_3/fonts/JiggeryPokery.ttf',
+                    'ironwork': 'phase_3/fonts/Ironwork.ttf',
+                    'aftershock': 'phase_3/fonts/Aftershock.ttf',
+                    'danger': 'phase_3/fonts/Danger.ttf',
+                    'alibi': 'phase_3/fonts/Alie.ttf',
+                    'remington': 'phase_3/fonts/vtRemingtonPortable.ttf',
+                    'portago': 'phase_3/fonts/Portago.ttf',
+                    'pudding': 'phase_3/fonts/HastyPudding.ttf',
+                    'hasty': 'phase_3/fonts/HastyPudding.ttf',
+                    'scurlock': 'phase_3/fonts/Scurlock.ttf',
+                    'oyster': 'phase_3/fonts/OysterBar.ttf',
+                    'reddog': 'phase_3/fonts/RedDogSaloon.ttf',
+                    'kingpin': 'phase_3/fonts/Kingpin.ttf',
                     'default': 'phase_3/fonts/ImpressBT.ttf'
                 }
                 
                 # Determine font path
-                if font_code and font_code.lower() in font_map:
-                    font_path = font_map[font_code.lower()]
-                else:
-                    # Use ImpressBT as default fallback
+                font_path = None
+                if font_code:
+                    f_code = font_code.lower()
+                    if f_code in font_map:
+                        font_path = font_map[f_code]
+                    else:
+                        # Try to find it by name in phase_3/fonts
+                        potential_path = f"phase_3/fonts/{font_code}.ttf"
+                        if os.path.exists(potential_path):
+                            font_path = potential_path
+                        else:
+                            potential_path = f"phase_3/fonts/{font_code}.bam"
+                            if os.path.exists(potential_path):
+                                font_path = potential_path
+
+                if not font_path:
                     font_path = font_map['default']
                 
                 if os.path.exists(font_path):

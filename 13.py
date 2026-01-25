@@ -13,10 +13,10 @@ base.localAvatar.setPos(0, 20, 0)
 
 # Tunnels in Silly Street
 LoadingZone = G["LoadingZone"]
-# Back to TTC Playground
-LoadingZone.define(-5, -5, 5, 5, 1)
+# Back to TTC Playground - Tunnel at (0, 0, 0) facing 180
+LoadingZone.define(-10, -10, 10, 10, 1, entryPos=(30, -146, 0.025), entryHpr=(180, 0, 0))
 # Forward to Donald's Dock (end of street)
-LoadingZone.define(775, 85, 785, 95, 2)
+LoadingZone.define(775, 85, 785, 95, 2, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
 
 # Setup tunnel at end of street to Daisy's Garden
 # G["loadStreet"]('phase_8/dna/daisys_garden_sz.xml', pos=(0, 600, 0), zone_key="next_sz")

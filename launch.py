@@ -279,6 +279,10 @@ G["loadingZoneMgr"] = loadingZoneMgr
 
 def loadZone(zoneId, entryPos=None, entryHpr=None):
     global breakAllChecks, zID
+    print(f"[loadZone] Loading zone {zoneId} (name: {getZoneName(zoneId)})")
+    if entryPos: print(f"[loadZone] Entry position: {entryPos}")
+    if entryHpr: print(f"[loadZone] Entry heading: {entryHpr}")
+
     breakAllChecks = True
     
     # Clear ice creams
@@ -328,7 +332,47 @@ def loadZone(zoneId, entryPos=None, entryHpr=None):
         base.entryHpr = None
     
     try:
-        execfile(f"{zID}.py")
+        # Before loading the new zone file, check if it's a street and set cog bounds
+        if hasattr(base, "cogMgr"):
+            # Determine bounds based on zone ID
+            # Playgrounds usually have wider bounds, streets have narrower or specific ones
+            if zoneId in [0, 1, 2, 3, 4, 9, 10]:  # Playgrounds
+                base.cogMgr.setZoneBounds(-500, 500, -500, 500)
+            elif zoneId >= 11:  # Streets
+                # Streets in Toontown are often long and narrow or branched
+                # For now, let's use a much larger bounding box for streets 
+                # to avoid them snapping to a small square in the middle
+                base.cogMgr.setZoneBounds(-2000, 2000, -2000, 2000)
+            else:
+                base.cogMgr.setZoneBounds(-300, 300, -300, 300)
+
+        # Special handling for zone 6 (Trolley Game)
+        if zoneId == 6:
+            # Randomly pick a game model
+            game_models = [
+                ("phase_4/models/minigames/maze_4player.bam", "Maze Game"),
+                ("phase_4/models/minigames/cogthief_game.bam", "Cog Game"),
+                ("phase_4/models/minigames/tag_game.bam", "Tag Game")
+            ]
+            selected_model, game_name = random.choice(game_models)
+            print(f"[Trolley] Loading {game_name}...")
+            
+            # Load the selected game model
+            game_np = loader.loadModel(selected_model)
+            game_np.reparentTo(render)
+            game_np.setPos(0, 0, 0)
+            currentLand.currentLandModels["minigame"] = game_np
+            
+            # Position player at game start
+            if localAvatar:
+                localAvatar.setPos(0, 0, 0.025)
+                localAvatar.setHpr(0, 0, 0)
+            
+            # Skip execfile since we handled it here (or let 6.py handle logic if it exists)
+            if os.path.exists("6.py"):
+                execfile("6.py")
+        else:
+            execfile(f"{zID}.py")
         
         # Set player position and heading to entry point if specified
         # This provides contextual positioning based on which tunnel was used
