@@ -10,9 +10,12 @@ base.localAvatar.setPos(0, 20, 0)
 # Tunnels in Elm Street
 LoadingZone = G["LoadingZone"]
 # Back to DG Playground
-LoadingZone.define(-65.8, 3.2, -55.8, 13.2, 3)
+LoadingZone.define(-65.8, 3.2, -55.8, 13.2, 3, entryPos=(187, 186, 0.025), entryHpr=(306, 0, 0))
 # Forward to TTC (Punchline Place)
-LoadingZone.define(673.14, 93.25, 683.14, 103.25, 1)
+LoadingZone.define(673.14, 93.25, 683.14, 103.25, 1, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+
+if hasattr(base, "cogMgr"):
+    base.cogMgr.setZoneBounds(-100, 700, -50, 150)
 
 # Load tunnel back to DG
 # G["loadStreet"]('phase_8/dna/daisys_garden_sz.xml', pos=(0,0,0))

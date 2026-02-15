@@ -9,13 +9,13 @@ G = get_builtins()
 LoadingZone = G["LoadingZone"]
 # Walrus Way (3126 -> 23) - Tunnel at (160.26, -80.77, -0.62) facing 90 HPR
 # Zone placed in front of tunnel (extending toward -Y)
-LoadingZone.define(150, -90, 170, -70, 23)
+LoadingZone.define(150, -90, 170, -70, 23, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 # Sleet Street (3233 -> 24) - Tunnel at (-22.77, -253.67, -0.85) facing 23 HPR
 # Zone placed in front of tunnel (extending toward -X and -Y)
-LoadingZone.define(-12, -245, -33, -262, 24)
+LoadingZone.define(-12, -245, -33, -262, 24, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 # Polar Place (3301 -> 25) - Tunnel at (100.11, 152.01, -0.54) facing 150 HPR
 # Zone placed in front of tunnel (extending toward +X and -Y)
-LoadingZone.define(115, 145, 90, 170, 25)
+LoadingZone.define(115, 145, 90, 170, 25, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/TB_nbrhood.ogg')

@@ -12,9 +12,12 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to DG Playground
-LoadingZone.define(-40, 0, -30, 10, 3)
+LoadingZone.define(-40, 0, -30, 10, 3, entryPos=(-109, 292, 0.025), entryHpr=(-130, 0, 0))
 # Forward to Donald's Dock (Seaweed Street)
-LoadingZone.define(690, 79.8, 700.05, 89.8, 2)
+LoadingZone.define(690, 79.8, 700.05, 89.8, 2, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+
+if hasattr(base, "cogMgr"):
+    base.cogMgr.setZoneBounds(-100, 800, -100, 150)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/GARDEN_sz.ogg')

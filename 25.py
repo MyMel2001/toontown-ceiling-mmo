@@ -12,9 +12,12 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to BR Playground
-LoadingZone.define(75, 195, 85, 205, 9)
+LoadingZone.define(75, 195, 85, 205, 9, entryPos=(-22, -253, 0.025), entryHpr=(23, 0, 0))
 # Forward to Lawbot HQ
-LoadingZone.define(200.292, 365, 210.292, 375, 11)
+LoadingZone.define(200.292, 365, 210.292, 375, 11, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+
+if hasattr(base, "cogMgr"):
+    base.cogMgr.setZoneBounds(-50, 300, -50, 450)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/TB_sz.ogg')

@@ -1,40 +1,44 @@
-from direct.actor.Actor import Actor
-from panda3d.core import *
-from direct.task import Task
-import math
-from math import pi, sin, cos
-from direct.showbase.ShowBase import ShowBase
-from direct.interval.IntervalGlobal import Sequence
-import threading
 import random
+from panda3d.core import *
+from direct.gui.DirectGui import *
+from direct.interval.IntervalGlobal import *
 
-# Randomly select a trolley game
-game_models = [
-    ("phase_4/models/minigames/maze_4player.bam", "Maze Game"),
-    ("phase_4/models/minigames/cogthief_game.bam", "Cog Game"),
-    ("phase_4/models/minigames/tag_game.bam", "Tag Game")
-]
-selected_game, game_name = random.choice(game_models)
+G = get_builtins()
 
-print(f"Loading Trolley Game: {game_name}")
+# Trolley Game Zone
+print("[Trolley] Initializing game logic...")
 
-currentLand.currentLandModels[zones[zID]] = loader.loadModel(selected_game)
-currentLand.currentLandModels[zones[zID]].reparentTo(render)
-currentLand.currentLandModels[zones[zID]].setHpr(180,0,0)
-currentLand.currentLandModels[zones[zID]].setPos(0,0,0)
-base.localAvatar.setPos(0,0,0)
-currentLand.currentLandModels[zones[zID]].setScale(12)
+# Setup game UI
+title = DirectLabel(text="TROLLEY GAME", scale=0.15, pos=(0, 0, 0.8), 
+                    frameColor=(0,0,0,0.5), text_fg=(1,1,1,1))
 
+# Instructions
+instr = DirectLabel(text="Use ARROW KEYS to move!\nPress ESC to exit game.", 
+                    scale=0.07, pos=(0, 0, 0.6), 
+                    frameColor=(0,0,0,0), text_fg=(1,1,0,1))
+
+def exitGame():
+    title.destroy()
+    instr.destroy()
+    base.ignore('escape')
+    # Return to TTC Playground
+    base.loadZone(1, entryPos=(-127, -65, 0.025), entryHpr=(90, 0, 0))
+
+base.accept('escape', exitGame)
+
+# Simple timer to auto-exit
+def timerTask(task):
+    if task.time > 30.0: # 30 second game
+        exitGame()
+        return task.done
+    return task.cont
+
+base.taskMgr.add(timerTask, "trolleyTimer")
+
+# Background music
 G["music"].stop()
-G["music"] = loader.loadSfx('phase_4/audio/bgm/EE_DiesandPies.ogg')
+G["music"] = loader.loadSfx('phase_4/audio/bgm/MG_SZ.ogg')
 G["music"].setLoop(True)
 G["music"].play()
 
-def sleepThenBackToPlayground():
-    import time
-    time.sleep(43)
-    #loadZone(G["pZID"])
-    loadZone(1)
-
-pgthr = threading.Thread(target=sleepThenBackToPlayground, args=(), kwargs={})
-pgthr.start()
+print("[Trolley] Game ready!")

@@ -1,11 +1,13 @@
-base.localAvatar.setPos(67.5842,-340.653,100.819)
+# Initial spawn point in Sellbot HQ (from tunnel)
+base.localAvatar.setPos(10, -241, 100.025)
+base.localAvatar.setHpr(0, 0, 0)
 
 G = get_builtins()
 LoadingZone = G["LoadingZone"]
 # Sellbot HQ Tunnel to Daisy's Garden
-# The tunnel model is likely at (0,0,0) or nearby
+# The tunnel model is at (10, -236, 100)
 # Daisy's Garden playground is zone 3
-LoadingZone.define(-15, -15, 15, 15, 3, entryPos=(0, 15, 0.025), entryHpr=(180, 0, 0))
+LoadingZone.define(5, -241, 15, -231, 3, entryPos=(10, -231, 0.025), entryHpr=(0, 0, 0))
 
 from direct.actor.Actor import Actor
 from panda3d.core import *

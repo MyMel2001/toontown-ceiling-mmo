@@ -18,6 +18,9 @@ LoadingZone.define(-10, -10, 10, 10, 1, entryPos=(-45, 106, 0.025), entryHpr=(0,
 # Forward to Minnie's Melody Land (end of street)
 LoadingZone.define(-585, -35, -575, -25, 0, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
 
+if hasattr(base, "cogMgr"):
+    base.cogMgr.setZoneBounds(-600, 100, -100, 100)
+
 # Setup tunnel at end of street to Donald's Docks
 # G["loadStreet"]('phase_6/dna/donalds_dock_sz.xml', pos=(0, 600, 0), zone_key="next_sz")
 

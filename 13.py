@@ -18,6 +18,9 @@ LoadingZone.define(-10, -10, 10, 10, 1, entryPos=(30, -146, 0.025), entryHpr=(18
 # Forward to Donald's Dock (end of street)
 LoadingZone.define(775, 85, 785, 95, 2, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
 
+if hasattr(base, "cogMgr"):
+    base.cogMgr.setZoneBounds(-100, 800, -100, 150)
+
 # Setup tunnel at end of street to Daisy's Garden
 # G["loadStreet"]('phase_8/dna/daisys_garden_sz.xml', pos=(0, 600, 0), zone_key="next_sz")
 

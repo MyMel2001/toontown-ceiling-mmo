@@ -12,9 +12,12 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to DD Playground
-LoadingZone.define(-5, -5, 5, 5, 2)
+LoadingZone.define(-5, -5, 5, 5, 2, entryPos=(-214, 75, 0.025), entryHpr=(-90, 0, 0))
 # Forward to The Brrrgh (Walrus Way)
-LoadingZone.define(625, -55, 635, -45, 9)
+LoadingZone.define(625, -55, 635, -45, 9, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+
+if hasattr(base, "cogMgr"):
+    base.cogMgr.setZoneBounds(-50, 700, -100, 100)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_6/audio/bgm/DD_sz.ogg')

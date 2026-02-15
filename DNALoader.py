@@ -181,10 +181,14 @@ class DNALoader:
             # If no sign_origin, try to find generic sign node or attach to parent
             sign_node = parent.find("**/sign")
             if sign_node.isEmpty():
-                sign_node = parent.attachNewNode("sign")
-                # Set a default position if no sign_origin exists to prevent underground signs
-                # Using a higher Z and slightly forward Y to be visible on generic buildings
-                sign_node.setPos(0, -0.1, 10.0)
+                # Look for other common attachment points in buildings
+                sign_node = parent.find("**/attach_sign")
+                if sign_node.isEmpty():
+                    sign_node = parent.attachNewNode("sign")
+                    # Set a default position if no sign_origin exists to prevent underground signs
+                    # Using a higher Z and slightly forward Y to be visible on generic buildings
+                    # Toontown buildings usually have signs at height 10-14
+                    sign_node.setPos(0, -0.5, 12.0)
 
         code = xml_node.get('code')
         if code and code in self.storage:
@@ -237,7 +241,7 @@ class DNALoader:
                 font_map = {
                     'mickey': 'phase_3/fonts/MickeyFont.ttf',
                     'minnie': 'phase_3/fonts/MinnieFont.ttf',
-                    'mickey_classic': 'phase_3/fonts/MickeyFontMaximum.bam',
+                    'mickey_classic': 'phase_3/fonts/MickeyFontClassic.bam',
                     'mickey_maximum': 'phase_3/fonts/MickeyFontMaximum.bam',
                     'mickey_standard': 'phase_3/fonts/MickeyFontStandard.bam',
                     'comic': 'phase_3/fonts/Comic.ttf',
@@ -255,7 +259,9 @@ class DNALoader:
                     'oyster': 'phase_3/fonts/OysterBar.ttf',
                     'reddog': 'phase_3/fonts/RedDogSaloon.ttf',
                     'kingpin': 'phase_3/fonts/Kingpin.ttf',
-                    'default': 'phase_3/fonts/ImpressBT.ttf'
+                    'default': 'phase_3/fonts/ImpressBT.ttf',
+                    'bvt': 'phase_3/fonts/vtRemingtonPortable.ttf',
+                    'tubular': 'phase_3/fonts/Aftershock.ttf'
                 }
                 
                 # Determine font path

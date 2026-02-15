@@ -14,9 +14,13 @@ base.localAvatar.setPos(0, 20, 0)
 # Tunnels in Loopy Lane
 LoadingZone = G["LoadingZone"]
 # Back to TTC Playground - Tunnel at (0, 0, 0) facing 180
-LoadingZone.define(-10, -10, 10, 10, 1, entryPos=(-149, 14, 0.025), entryHpr=(270, 0, 0))
+# Corrected TTC exit position: TTC tunnel is at (-146.117, -4.0677) roughly
+LoadingZone.define(-10, -10, 10, 10, 1, entryPos=(-140, 4, 0.025), entryHpr=(90, 0, 0))
 # Forward to Daisy's Garden Playground (end of street)
 LoadingZone.define(-365, -405, -355, -395, 3, entryPos=(22, 60, 0.025), entryHpr=(0, 0, 0))
+
+if hasattr(base, "cogMgr"):
+    base.cogMgr.setZoneBounds(-400, 100, -500, 100)
 
 # Setup tunnel at end of street to Melodyland
 # Coordinates for MML tunnel in TTC 2100 are approx (0, 600, 0)

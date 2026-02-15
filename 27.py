@@ -12,9 +12,12 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to DL Playground
-LoadingZone.define(75, 125, 85, 135, 10)
+LoadingZone.define(75, 125, 85, 135, 10, entryPos=(55, 195, 0.025), entryHpr=(180, 0, 0))
 # Forward to Cashbot HQ
-LoadingZone.define(-151.735, -81.4866, -141.735, -71.4866, 8)
+LoadingZone.define(-151.735, -81.4866, -141.735, -71.4866, 8, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+
+if hasattr(base, "cogMgr"):
+    base.cogMgr.setZoneBounds(-200, 100, -100, 200)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/DL_sz.ogg')

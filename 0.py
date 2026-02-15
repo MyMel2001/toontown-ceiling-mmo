@@ -13,17 +13,17 @@ if hasattr(base, 'cogMgr'):
 LoadingZone = G["LoadingZone"]
 # Loopy Lane (To TTC) - Tunnel at (80, 169.99, -0.17) facing 180 HPR
 # Zone placed in front of tunnel (extending toward -Y)
-LoadingZone.define(65, 155, 95, 185, 11)
+LoadingZone.define(65, 155, 95, 185, 11, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 
 # Tenor Terrace (4340 -> 15) - Tunnel at (-25, -209.95, -0.17) facing 0 HPR
 # Zone placed in front of tunnel (extending toward -Y)
-LoadingZone.define(-40, -220, -10, -200, 15)
+LoadingZone.define(-40, -220, -10, -200, 15, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 # Alto Avenue (4127 -> 16) - Tunnel at (80, 169.99, -0.17) facing 180 HPR
 # Zone placed in front of tunnel (extending toward -Y)
-LoadingZone.define(65, 155, 95, 185, 16)
+LoadingZone.define(65, 155, 95, 185, 16, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 # Baritone Boulevard (4222 -> 17) - Tunnel at (-170.012, 44.58, -0.5) facing -90 HPR
 # Zone placed in front of tunnel (extending toward +Y)
-LoadingZone.define(-180, 34, -160, 54, 17)
+LoadingZone.define(-180, 34, -160, 54, 17, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 
 global isCurrentZone
 isCurrentZone = True

@@ -12,9 +12,12 @@ base.localAvatar.setPos(0, 20, 0)
 
 LoadingZone = G["LoadingZone"]
 # Back to BR Playground
-LoadingZone.define(115, 145, 125, 155, 9)
+LoadingZone.define(115, 145, 125, 155, 9, entryPos=(100, 152, 0.025), entryHpr=(150, 0, 0))
 # Forward to Minnie's Melody Land (Alto Avenue)
-LoadingZone.define(150, 365, 160, 375, 0)
+LoadingZone.define(150, 365, 160, 375, 0, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+
+if hasattr(base, "cogMgr"):
+    base.cogMgr.setZoneBounds(-100, 300, -50, 450)
 
 G["music"].stop()
 G["music"] = loader.loadSfx('phase_8/audio/bgm/TB_sz.ogg')
