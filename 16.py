@@ -4,17 +4,16 @@ currentLand.currentLandModels[zones[zID]] = dna_loader.loadDNA('phase_6/dna/minn
 currentLand.currentLandModels[zones[zID]].reparentTo(render)
 currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 
-# Load the tunnel back to MML
-# G["loadStreet"]('phase_6/dna/minnies_melody_land_sz.xml', pos=(0,0,0))
-
-# Setup tunnel collision
-base.localAvatar.setPos(0, 20, 0)
+# Spawn near the tunnel back to MML
+base.localAvatar.setPos(80, 160, 0)
 
 LoadingZone = G["LoadingZone"]
-# Back to MML Playground
-LoadingZone.define(75, 155, 85, 165, 0, entryPos=(80, 160, 0.025), entryHpr=(180, 0, 0))
-# Forward to The Brrrgh (Sleet Street)
-LoadingZone.define(135, 395, 145, 405, 9, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+# Back to MML Playground - Tunnel at (80, 165, 0) facing 180
+# Loading zone in front of tunnel (player approaches from -Y direction)
+LoadingZone.define(70, 155, 90, 175, 0, entryPos=(80, 170, 0.025), entryHpr=(180, 0, 0))
+# Forward to The Brrrgh (Sleet Street) - Tunnel at (140, 400, 0) facing 0
+# Loading zone in front of tunnel (player approaches from -Y direction)
+LoadingZone.define(130, 390, 150, 410, 24, entryPos=(120, 150, 0.025), entryHpr=(-180, 0, 0))
 
 if hasattr(base, "cogMgr"):
     base.cogMgr.setZoneBounds(-100, 200, -50, 450)

@@ -20,6 +20,43 @@ class ToontownServer(ShowBase):
         self.cogs = {} # zoneId: {cogId: data}
         self.nextCogId = 1
 
+        # Zone bounds for COG spawning (minX, maxX, minY, maxY)
+        # Based on actual street/playground sizes from DNA files and tunnel positions
+        # Bounds are set to encompass the playable street area between tunnel entrances
+        self.zoneBounds = {
+            # Playgrounds - no COGs spawn in safe zones
+            0: (-60, 60, -60, 60),      # Melodyland
+            1: (-100, 100, -100, 100),  # TTC (no COGs in safe zone)
+            2: (-150, 150, -150, 150),  # DD
+            3: (-80, 80, -80, 80),      # DG
+            4: (-200, 200, -200, 200),  # Goofy Speedway
+            9: (-80, 80, -80, 80),      # Brrrgh
+            10: (-60, 60, -60, 60),     # Dreamland
+            # TTC Streets (zone IDs match file numbers)
+            11: (-350, -60, -400, 0),   # Loopy Lane: TTC(-90,-80) to DG(-360,-400)
+            12: (-560, -60, -80, 130),  # Punchline Place: TTC(-75,115) to MML(-580,-30)
+            13: (-20, 780, -20, 120),   # Silly Street: TTC(0,0) to DD(780,90)
+            # DD Streets
+            14: (-80, 700, -20, 130),   # Elm Street: DG(-61,8) to TTC(678,98)
+            18: (140, 400, -80, 10),    # Barnacle Blvd: DD(160,-50) to TTC(370,-30)
+            19: (-310, -170, -440, -110), # Seaweed St: DD(-185,-125) to DG(-295,-430)
+            20: (-20, 650, -80, 10),    # Lighthouse Lane: DD(0,0) to BR(630,-50)
+            # MM Streets
+            15: (-480, -150, 20, 230),  # Tenor Terrace: MML(-165,40) to TTC(-460,210)
+            16: (60, 170, 140, 420),    # Alto Ave: MML(80,165) to BR(140,400)
+            17: (30, 720, 180, 240),    # Baritone Blvd: DL(60,0) to MML(695,215)
+            # DG Streets
+            21: (-60, 720, -30, 110),   # Labyrinth Lane: DG(-35,5) to DD(695,85)
+            22: (-330, -70, -80, 340),  # Oak St: DG(-85,-60) to Sellbot(-311,316)
+            # BR Streets
+            23: (160, 460, -100, 230),  # Walrus Way: BR(175,-80) to DD(440,210)
+            24: (100, 175, 130, 390),   # Sleet St: BR(120,150) to MML(155,370)
+            25: (60, 220, 180, 390),    # Polar Place: BR(80,200) to Lawbot(205,370)
+            # DL Streets
+            26: (-120, 30, -520, 60),   # Lullaby Lane: DL(5,40) to MML(-99,-509)
+            27: (-170, 100, -100, 150), # Pajama Place: DL(80,130) to Cashbot(-147,-76)
+        }
+
         port = 1913
         self.tcpSocket = self.cManager.openTCPServerRendezvous(port, 5)
         if self.tcpSocket:
@@ -43,9 +80,14 @@ class ToontownServer(ShowBase):
             if not playersInZone:
                 continue
 
+            # Get zone bounds for this zone
+            bounds = self.zoneBounds.get(zoneId, (-100, 100, -100, 100))
+            minX, maxX, minY, maxY = bounds
+            margin = 10  # Keep COGs away from edges
+
             for cogId, cog in cogs.items():
                 if cog.get('inBattle'): continue
-                
+
                 # Simple random walk
                 dist = (Vec3(cog['pos']) - Vec3(cog['target_pos'])).length()
                 if dist > 1:
@@ -55,16 +97,23 @@ class ToontownServer(ShowBase):
                     cog['pos'] = (newPos.getX(), newPos.getY(), newPos.getZ())
                     # Calculate H
                     cog['h'] = math.atan2(-dir.getX(), dir.getY()) * 180 / math.pi
-                    
+
+                    # Enforce bounds - clamp position to stay within zone
+                    x, y, z = cog['pos']
+                    x = max(minX + margin, min(maxX - margin, x))
+                    y = max(minY + margin, min(maxY - margin, y))
+                    cog['pos'] = (x, y, z)
+
                     # Broadcast update periodically or if moved enough
                     # For now just broadcast every tick to keep it simple, but maybe too much traffic
                 else:
-                    cog['target_pos'] = (cog['orig_pos'][0] + random.uniform(-50, 50),
-                                        cog['orig_pos'][1] + random.uniform(-50, 50),
-                                        cog['orig_pos'][2])
-            
+                    # Pick a new target within bounds
+                    new_x = random.uniform(minX + margin, maxX - margin)
+                    new_y = random.uniform(minY + margin, maxY - margin)
+                    cog['target_pos'] = (new_x, new_y, cog['pos'][2])
+
             self.broadcastCogPos(zoneId)
-        
+
         return Task.cont
 
     def spawnCogsForZone(self, zoneId):
@@ -85,10 +134,10 @@ class ToontownServer(ShowBase):
     def spawnCog(self, zoneId):
         if zoneId not in self.cogs:
             self.cogs[zoneId] = {}
-            
+
         cogId = self.nextCogId
         self.nextCogId += 1
-        
+
         cogData = random.choice([
             ("Flunky", "C"), ("Pencil Pusher", "B"), ("Yesman", "A"), ("Micromanager", "C"),
             ("Downsizer", "B"), ("Head Hunter", "A"), ("Corporate Raider", "C"), ("The Big Cheese", "A"),
@@ -99,11 +148,23 @@ class ToontownServer(ShowBase):
             ("Cold Caller", "C"), ("Telemarketer", "B"), ("Name Dropper", "A"), ("Glad Hander", "C"),
             ("Mover & Shaker", "B"), ("Two-Face", "A"), ("The Mingler", "C"), ("Mr. Hollywood", "A")
         ])
-        
+
         name, type = cogData
         level = random.randint(1, 12)
-        pos = (random.uniform(-100, 100), random.uniform(-100, 100), 0)
-        
+
+        # Use zone-specific bounds for spawning
+        if zoneId in self.zoneBounds:
+            minX, maxX, minY, maxY = self.zoneBounds[zoneId]
+            # Spawn within the bounds, with some margin from edges
+            margin = 20
+            x = random.uniform(minX + margin, maxX - margin)
+            y = random.uniform(minY + margin, maxY - margin)
+        else:
+            # Default spawn area
+            x = random.uniform(-100, 100)
+            y = random.uniform(-100, 100)
+        pos = (x, y, 0)
+
         self.cogs[zoneId][cogId] = {
             'name': name,
             'type': type,
@@ -116,7 +177,7 @@ class ToontownServer(ShowBase):
             'maxHp': (level + 1) * (level + 2),
             'inBattle': False
         }
-        
+
         # Broadcast to all players in zone
         self.broadcastCogSpawn(zoneId, cogId)
 

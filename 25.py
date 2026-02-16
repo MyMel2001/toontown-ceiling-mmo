@@ -4,17 +4,16 @@ currentLand.currentLandModels[zones[zID]] = dna_loader.loadDNA('phase_8/dna/the_
 currentLand.currentLandModels[zones[zID]].reparentTo(render)
 currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 
-# Load the tunnel back to BR
-# G["loadStreet"]('phase_8/dna/the_burrrgh_sz.xml', pos=(0,0,0))
-
-# Setup tunnel collision
-base.localAvatar.setPos(0, 20, 0)
+# Spawn near the tunnel back to BR
+base.localAvatar.setPos(80, 195, 0)
 
 LoadingZone = G["LoadingZone"]
-# Back to BR Playground
-LoadingZone.define(75, 195, 85, 205, 9, entryPos=(-22, -253, 0.025), entryHpr=(23, 0, 0))
-# Forward to Lawbot HQ
-LoadingZone.define(200.292, 365, 210.292, 375, 11, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+# Back to BR Playground - Tunnel at (80, 200, 0) facing -180
+# Loading zone in front of tunnel (player approaches from +Y direction)
+LoadingZone.define(70, 190, 90, 210, 9, entryPos=(100, 152, 0.025), entryHpr=(150, 0, 0))
+# Forward to Lawbot HQ - Tunnel at (205.29, 370, -0.414) facing -90
+# Loading zone in front of tunnel (player approaches from +X direction)
+LoadingZone.define(195, 360, 215, 380, 11, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
 
 if hasattr(base, "cogMgr"):
     base.cogMgr.setZoneBounds(-50, 300, -50, 450)

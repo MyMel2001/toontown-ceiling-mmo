@@ -17,11 +17,11 @@ createNPC(['ca', 'ls', False, 'ls', 'l', 'Cartoonival Blue', 'Cartoonival Blue',
 
 LoadingZone = G["LoadingZone"]
 # Punchline Place (To Docks)
-LoadingZone.define(-38.3287, 91.7318, -53.18, 101.799, 12, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
+LoadingZone.define(-38.3287, 91.7318, -53.18, 101.799, 13, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 # Loopy Lane (To Melodyland)
-LoadingZone.define(-146.117, -4.0677, -153.27, 12.1799, 11, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
+LoadingZone.define(-146.117, -4.0677, -153.27, 12.1799, 12, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 # Silly Street (To Garden)
-LoadingZone.define(34.5333, -163.679, 24.6789, -148.533, 13, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
+LoadingZone.define(34.5333, -163.679, 24.6789, -148.533, 11, entryPos=(0, 20, 0.025), entryHpr=(0, 0, 0))
 
 # Toontown Central Playground Extras
 # Goofy Speedway

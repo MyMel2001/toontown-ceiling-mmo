@@ -4,17 +4,16 @@ currentLand.currentLandModels[zones[zID]] = dna_loader.loadDNA('phase_6/dna/dona
 currentLand.currentLandModels[zones[zID]].reparentTo(render)
 currentLand.currentLandModels[zones[zID]].setPos(0, 0, 0)
 
-# Load the tunnel back to DD
-# G["loadStreet"]('phase_6/dna/donalds_dock_sz.xml', pos=(0,0,0))
-
-# Setup tunnel collision
-base.localAvatar.setPos(0, 20, 0)
+# Spawn near the tunnel back to DD
+base.localAvatar.setPos(-180, -120, 0)
 
 LoadingZone = G["LoadingZone"]
-# Back to DD Playground
-LoadingZone.define(-190, -130, -180, -120, 2, entryPos=(-198, -108, 0.025), entryHpr=(-34, 0, 0))
-# Forward to Daisy's Garden
-LoadingZone.define(-300, -435, -290, -425, 3, entryPos=(0, 0, 0.025), entryHpr=(0, 0, 0))
+# Back to DD Playground - Tunnel at (-185, -125, 0) facing 0
+# Loading zone in front of tunnel (player approaches from -Y direction)
+LoadingZone.define(-195, -140, -175, -110, 2, entryPos=(-215, 75, 0.025), entryHpr=(-90, 0, 0))
+# Forward to Daisy's Garden (Labyrinth Lane) - Tunnel at (-295, -430, 0) facing -90
+# Loading zone in front of tunnel (player approaches from +Y direction)
+LoadingZone.define(-310, -445, -280, -415, 21, entryPos=(-35, 5, 0.025), entryHpr=(90, 0, 0))
 
 if hasattr(base, "cogMgr"):
     base.cogMgr.setZoneBounds(-400, 100, -500, 100)
