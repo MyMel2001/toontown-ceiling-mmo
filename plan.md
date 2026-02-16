@@ -21,7 +21,7 @@ Fix/add these in order of importance for game design and a good game overall.
 ### Loading Zone Positions
 Some (not all) loading zones now use proper positions based on tunnel coordinates from DNA files:
 * [x] TTC Playground (1.py) - Fixed loading zones for Punchline Place, Loopy Lane, Silly Street, Goofy Speedway
-* [x] TTC Streets (11.py, 12.py, 13.py) - Loopy Lane, Punchline Place, Silly Street (except for streets going back to TTC.)
+* [x] TTC Streets (11.py, 12.py, 13.py) - Loopy Lane, Punchline Place, Silly Street (except for tunnels going back to TTC.)
 
 ### Other Fixes
 * [x] Fixed spawn positions (base.localAvatar.setPos) in all street zone files
