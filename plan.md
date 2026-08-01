@@ -10,7 +10,7 @@ Fix/add these in order of importance for game design and a good game overall.
 ## Remaining Issues
 
 * ***DNA Loader*** DNA loading is a bit nutzo-buttso. (SOME signs underground.) - May be model-specific issues with sign_origin nodes
-* ***Tasks*** Tasks/Quets don't turn into NPCs properly (it doesn't detect NPC in range weiter i'm 6ft from the NPC or right on top of them.)
+* ***Tasks*** Tasks/Quests don't turn into NPCs properly (it doesn't detect NPC in range wether i'm 6ft from the NPC or right on top of them.)
 * ***Loading Zones*** Not all loading zones are correctly positioned.
 
 ## Completed Fixes (2026-02-15)
